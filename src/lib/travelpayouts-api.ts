@@ -3,7 +3,7 @@
 // Queries Aviasales / Travelpayouts Live Prices API with zero artificial discounts
 // =========================================================================
 
-import { TripCombination, TravelVibe } from './types';
+import { TravelVibe } from './types';
 import { AFFILIATE_CONFIG } from './affiliate';
 
 export interface LiveFlightData {
@@ -48,7 +48,7 @@ const AIRLINE_NAMES: Record<string, string> = {
 };
 
 import { DESTINATION_DIRECTORY, resolveDestinationMeta, DestinationMeta } from './destination-data';
-import { TravelpayoutsCheapResponse, TravelpayoutsFlightItem } from './types';
+import { TravelpayoutsCheapResponse, TravelpayoutsFlightItem, TripCombination, ALL_AIRPORTS } from './types';
 export { DESTINATION_DIRECTORY, resolveDestinationMeta };
 export type { DestinationMeta };
 
@@ -113,13 +113,18 @@ export async function getLiveFlightTrips(
     }
 
     console.log(`[Travelpayouts API] Raw destinations received:`, Object.keys(json.data));
-
     const trips: TripCombination[] = [];
     const destEntries = Object.entries(json.data);
+    const originAirport = ALL_AIRPORTS.find((a) => a.code === cleanOrigin) || { code: cleanOrigin, name: cleanOrigin, city: cleanOrigin };
+    const isCanaryOrigin = ['TFS', 'TFN', 'LPA', 'ACE', 'FUE', 'SPC'].includes(cleanOrigin);
 
     for (const [destIata, flightOptions] of destEntries) {
-      // Resolve destination metadata (Directory or dynamic fallback)
+      // Ignore same-city roundtrips
+      if (destIata.toUpperCase() === cleanOrigin) continue;
+
+      // Strictly resolve curated destination metadata - do NOT show random unverified codes
       const destMeta = resolveDestinationMeta(destIata);
+      if (!destMeta) continue;
 
       // Get the flight options array
       if (!flightOptions || typeof flightOptions !== 'object') continue;
@@ -129,9 +134,14 @@ export async function getLiveFlightTrips(
       const flightInfo = optionsArray[0];
       if (!isValidFlightItem(flightInfo)) continue;
       
-      // 100% REAL RAW FLIGHT PRICE from Travelpayouts / Aviasales
-      const finalFlightPrice = Math.round(Number(flightInfo.price));
-      if (finalFlightPrice <= 0 || isNaN(finalFlightPrice)) continue;
+      const rawPrice = Number(flightInfo.price);
+      if (rawPrice <= 0 || isNaN(rawPrice)) continue;
+
+      // Apply 75% resident discount to Spanish national flights (Canary-Peninsula / Interinsular)
+      const isDomestic = destMeta.countryCode === 'ES';
+      const finalFlightPrice = (isResident && isCanaryOrigin && isDomestic)
+        ? Math.max(14, Math.round(rawPrice * 0.25))
+        : Math.round(rawPrice);
 
       const departureDate = flightInfo.departure_at || new Date(Date.now() + 86400000 * 20).toISOString();
       const returnDate = flightInfo.return_at || new Date(Date.now() + 86400000 * (20 + nightsCount)).toISOString();
@@ -162,7 +172,7 @@ export async function getLiveFlightTrips(
         outboundFlight: {
           departure: departureDate,
           arrival: new Date(new Date(departureDate).getTime() + 1000 * 60 * 165).toISOString(),
-          origin: { code: cleanOrigin, name: cleanOrigin, city: cleanOrigin },
+          origin: originAirport,
           destination: { code: destIata, name: destMeta.city, city: destMeta.city },
           airline: airlineName,
           flightNumber: flightNumber,
@@ -175,7 +185,7 @@ export async function getLiveFlightTrips(
           departure: returnDate,
           arrival: new Date(new Date(returnDate).getTime() + 1000 * 60 * 165).toISOString(),
           origin: { code: destIata, name: destMeta.city, city: destMeta.city },
-          destination: { code: cleanOrigin, name: cleanOrigin, city: cleanOrigin },
+          destination: originAirport,
           airline: airlineName,
           flightNumber: `${airlineCode}${Number(flightInfo.flight_number || 101) + 1}`,
           duration: '2h 45m',
@@ -203,24 +213,25 @@ export async function getLiveFlightTrips(
         hotelPrice: hotelTotalPrice,
         totalPrice: totalPrice,
         nights: nightsCount,
-        tripScore: Math.min(99, tripScore),
-        scores: { price: priceScore, hotel: Math.round(destMeta.hotelRating * 10), flight: 96, convenience: 92, destination: 95 },
-        aiExplanation: `Oferta en tiempo real desde ${cleanOrigin} a ${destMeta.city}. Vuelo ida y vuelta con ${airlineName} (${finalFlightPrice} €) + ${nightsCount} noches en hotel céntrico (${hotelTotalPrice} €) por ${totalPrice} € total.`,
-        tags: [
-          flightInfo.transfers === 0 ? '✈️ Vuelo Directo' : '✈️ Vuelo verificado',
-          '🥐 Desayuno Incluido',
-          `🏨 ${destMeta.hotelStars} Estrellas`,
-          '⚡ Tarifa en Vivo'
-        ],
+        tripScore: tripScore,
+        scores: {
+          price: priceScore,
+          hotel: Math.round(destMeta.hotelRating * 10),
+          flight: 96,
+          convenience: 92,
+          destination: 95,
+        },
+        aiExplanation: `Oferta en tiempo real desde ${cleanOrigin} a ${destMeta.city}. Vuelo ida y vuelta con ${airlineName} (${finalFlightPrice} €${isResident && isCanaryOrigin && isDomestic ? ' con dto. residente' : ''}) + ${nightsCount} noches en hotel céntrico (${hotelTotalPrice} €) por ${totalPrice} € total.`,
+        tags: ['✈️ Vuelo verificado', '🥐 Desayuno Incluido', `🏨 ${destMeta.hotelStars} Estrellas`, '⚡ Tarifa en Vivo'],
         vibe: destMeta.vibe,
-        priceTrend: totalPrice <= 140 ? 'lowest' : 'stable',
+        priceTrend: totalPrice < 160 ? 'lowest' : 'stable',
         destinationCost: {
           dailyAverage: destMeta.dailyCost,
           beerPrice: destMeta.beer,
           mealPrice: destMeta.meal,
           coffeePrice: destMeta.coffee,
           transportPrice: destMeta.transport,
-          costTier: destMeta.dailyCost > 45 ? 'high' : destMeta.dailyCost > 35 ? 'medium' : 'low',
+          costTier: destMeta.dailyCost > 45 ? 'high' : destMeta.dailyCost > 34 ? 'medium' : 'low',
         },
         weather: {
           temp: destMeta.temp,
