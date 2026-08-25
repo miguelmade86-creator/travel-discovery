@@ -36,12 +36,21 @@ export const viewport: Viewport = {
 };
 
 import Providers from "@/components/common/Providers";
+import Script from "next/script";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${spaceGrotesk.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+        
+        {/* Official Travelpayouts Drive Tracking Script */}
+        <Script
+          id="travelpayouts-drive"
+          strategy="afterInteractive"
+          src="https://tp-em.com/NTY2NjI4.js?t=566628"
+          data-cmp-ab="2"
+        />
       </body>
     </html>
   );

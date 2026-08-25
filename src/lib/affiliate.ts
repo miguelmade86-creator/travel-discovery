@@ -5,7 +5,7 @@
 
 export const AFFILIATE_CONFIG = {
   // Travelpayouts Marker (All-in-One: Kiwi, Aviasales, WayAway, Hotellook, Booking, DiscoverCars, IATI/Heymondo)
-  travelpayoutsMarker: process.env.NEXT_PUBLIC_TRAVELPAYOUTS_MARKER || '612890',
+  travelpayoutsMarker: process.env.NEXT_PUBLIC_TRAVELPAYOUTS_MARKER || '566628',
   
   // Civitatis Affiliate Partner ID (Direct Tours & Activities)
   civitatisAffiliateId: process.env.NEXT_PUBLIC_CIVITATIS_AFFILIATE_ID || '14285',
