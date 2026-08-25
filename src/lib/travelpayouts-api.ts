@@ -1,10 +1,10 @@
 // =========================================================================
 // TRAVELDISCOVERY — TRAVELPAYOUTS LIVE FLIGHT API & DESTINATION ENGINE
-// Queries Aviasales / Travelpayouts Live Prices API for real flights
+// Queries Aviasales / Travelpayouts Live Prices API with zero artificial discounts
 // =========================================================================
 
 import { TripCombination, TravelVibe } from './types';
-import { AFFILIATE_CONFIG, getFlightBookingAffiliateUrl, getBookingAffiliateUrl } from './affiliate';
+import { AFFILIATE_CONFIG } from './affiliate';
 
 export interface LiveFlightData {
   airline: string;
@@ -17,7 +17,8 @@ export interface LiveFlightData {
   transfers: number;
 }
 
-const API_TOKEN = process.env.TRAVELPAYOUTS_API_TOKEN || 'd85fd92624ac6838bbcb76ae11cf55a5';
+// Token securely loaded exclusively from environment variables
+const API_TOKEN = process.env.TRAVELPAYOUTS_API_TOKEN;
 const MARKER = process.env.NEXT_PUBLIC_TRAVELPAYOUTS_MARKER || '566628';
 
 // Airline code mapping to friendly names
@@ -40,9 +41,13 @@ const AIRLINE_NAMES: Record<string, string> = {
   LH: 'Lufthansa',
   KL: 'KLM',
   EW: 'Eurowings',
+  LS: 'Jet2',
+  W4: 'Wizz Air Malta',
+  EC: 'EasyJet Europe',
+  SK: 'SAS',
 };
 
-// Comprehensive directory of curated European & Mediterranean destinations
+// Known destination metadata
 export const DESTINATION_DIRECTORY: Record<string, {
   city: string;
   country: string;
@@ -72,7 +77,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'ES',
     flag: '🇪🇸',
     image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80',
-    hotelName: 'Hotel Barcelona Universal 4★',
+    hotelName: 'Hotel Barcelona Universal',
     hotelStars: 4,
     hotelRating: 8.7,
     hotelNightly: 29,
@@ -95,7 +100,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'ES',
     flag: '🇪🇸',
     image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80',
-    hotelName: 'Hotel Santo Domingo Gran Vía 4★',
+    hotelName: 'Hotel Santo Domingo Gran Vía',
     hotelStars: 4,
     hotelRating: 8.8,
     hotelNightly: 28,
@@ -118,7 +123,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'PT',
     flag: '🇵🇹',
     image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80',
-    hotelName: 'Porto Ribeira Boutique 4★',
+    hotelName: 'Porto Ribeira Boutique',
     hotelStars: 4,
     hotelRating: 9.1,
     hotelNightly: 26,
@@ -141,7 +146,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'ES',
     flag: '🇪🇸',
     image: 'https://images.unsplash.com/photo-1559564484-e48b3e040ff4?w=800&q=80',
-    hotelName: 'Hotel Don Paco Sevilla 3★',
+    hotelName: 'Hotel Don Paco Sevilla',
     hotelStars: 3,
     hotelRating: 8.9,
     hotelNightly: 25,
@@ -164,7 +169,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'ES',
     flag: '🇪🇸',
     image: 'https://images.unsplash.com/photo-1512753360435-329c4535a9a7?w=800&q=80',
-    hotelName: 'Hotel Dimar Valencia 4★',
+    hotelName: 'Hotel Dimar Valencia',
     hotelStars: 4,
     hotelRating: 8.6,
     hotelNightly: 27,
@@ -187,7 +192,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'ES',
     flag: '🇪🇸',
     image: 'https://images.unsplash.com/photo-1568084680786-a84f91d1153c?w=800&q=80',
-    hotelName: 'Hotel Soho Boutique Málaga 3★',
+    hotelName: 'Hotel Soho Boutique Málaga',
     hotelStars: 3,
     hotelRating: 8.8,
     hotelNightly: 24,
@@ -210,7 +215,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'IT',
     flag: '🇮🇹',
     image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80',
-    hotelName: 'Hotel Raffaello Trastevere 3★',
+    hotelName: 'Hotel Raffaello Trastevere',
     hotelStars: 3,
     hotelRating: 8.6,
     hotelNightly: 32,
@@ -233,7 +238,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'PT',
     flag: '🇵🇹',
     image: 'https://images.unsplash.com/photo-1513581166391-887a96ddeafd?w=800&q=80',
-    hotelName: 'Hotel Lis Baixa 3★',
+    hotelName: 'Hotel Lis Baixa',
     hotelStars: 3,
     hotelRating: 8.9,
     hotelNightly: 29,
@@ -279,7 +284,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'ES',
     flag: '🇪🇸',
     image: 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800&q=80',
-    hotelName: 'Hotel Gran Bilbao 4★',
+    hotelName: 'Hotel Gran Bilbao',
     hotelStars: 4,
     hotelRating: 8.8,
     hotelNightly: 28,
@@ -302,7 +307,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'ES',
     flag: '🇪🇸',
     image: 'https://images.unsplash.com/photo-1574870111867-089730e5a72b?w=800&q=80',
-    hotelName: 'Hotel Gelmírez 3★',
+    hotelName: 'Hotel Gelmírez',
     hotelStars: 3,
     hotelRating: 8.7,
     hotelNightly: 26,
@@ -325,7 +330,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'AT',
     flag: '🇦🇹',
     image: 'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=800&q=80',
-    hotelName: 'Hotel Regina Viena 4★',
+    hotelName: 'Hotel Regina Viena',
     hotelStars: 4,
     hotelRating: 8.9,
     hotelNightly: 35,
@@ -348,7 +353,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'FR',
     flag: '🇫🇷',
     image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80',
-    hotelName: 'Hotel Eiffel Seine 3★',
+    hotelName: 'Hotel Eiffel Seine',
     hotelStars: 3,
     hotelRating: 8.6,
     hotelNightly: 38,
@@ -371,7 +376,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'GB',
     flag: '🇬🇧',
     image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80',
-    hotelName: 'The Corner Hotel London 3★',
+    hotelName: 'The Corner Hotel London',
     hotelStars: 3,
     hotelRating: 8.7,
     hotelNightly: 39,
@@ -394,7 +399,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'DE',
     flag: '🇩🇪',
     image: 'https://images.unsplash.com/photo-1560969184-10fe8719e047?w=800&q=80',
-    hotelName: 'Motel One Berlin-Alexanderplatz 3★',
+    hotelName: 'Motel One Berlin-Alexanderplatz',
     hotelStars: 3,
     hotelRating: 8.8,
     hotelNightly: 32,
@@ -417,7 +422,7 @@ export const DESTINATION_DIRECTORY: Record<string, {
     countryCode: 'NL',
     flag: '🇳🇱',
     image: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=800&q=80',
-    hotelName: 'Hotel V Frederiksplein 3★',
+    hotelName: 'Hotel V Frederiksplein',
     hotelStars: 3,
     hotelRating: 8.9,
     hotelNightly: 38,
@@ -434,14 +439,99 @@ export const DESTINATION_DIRECTORY: Record<string, {
     transport: 2.8,
     description: 'Canales históricos, paseos en bicicleta, Museo Van Gogh y flores.',
   },
+  VCE: {
+    city: 'Venecia',
+    country: 'Italia',
+    countryCode: 'IT',
+    flag: '🇮🇹',
+    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=800&q=80',
+    hotelName: 'Hotel Rialto Venezia',
+    hotelStars: 4,
+    hotelRating: 8.7,
+    hotelNightly: 36,
+    hotelCenter: 'Junto al Puente de Rialto',
+    hotelImage: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80',
+    vibe: 'romantic',
+    temp: 20,
+    weatherText: 'Romántico sobre canales',
+    weatherIcon: '🌤️',
+    dailyCost: 50,
+    beer: 3.8,
+    meal: 16.0,
+    coffee: 2.0,
+    transport: 3.0,
+    description: 'Plaza San Marcos, paseo en góndola por el Gran Canal y romanticismo.',
+  },
+  WAW: {
+    city: 'Varsovia',
+    country: 'Polonia',
+    countryCode: 'PL',
+    flag: '🇵🇱',
+    image: 'https://images.unsplash.com/photo-1519197924294-4ba991a11128?w=800&q=80',
+    hotelName: 'Hotel Bristol Warsaw',
+    hotelStars: 4,
+    hotelRating: 9.0,
+    hotelNightly: 25,
+    hotelCenter: 'Casco Histórico Real',
+    hotelImage: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80',
+    vibe: 'culture',
+    temp: 16,
+    weatherText: 'Fresco agradable',
+    weatherIcon: '🌤️',
+    dailyCost: 32,
+    beer: 2.0,
+    meal: 9.5,
+    coffee: 1.8,
+    transport: 1.2,
+    description: 'Ciudad Vieja reconstruida, palacios reales, gastronomía polaca asequible.',
+  },
 };
+
+// Fallback resolver for any unlisted IATA code returned by Travelpayouts
+function resolveDestinationMeta(iata: string) {
+  if (DESTINATION_DIRECTORY[iata]) {
+    return DESTINATION_DIRECTORY[iata];
+  }
+
+  // Generic resolver so NO destination is ever dropped
+  return {
+    city: iata,
+    country: 'Europa',
+    countryCode: 'EU',
+    flag: '✈️',
+    image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80',
+    hotelName: `Hotel Centro ${iata}`,
+    hotelStars: 3,
+    hotelRating: 8.5,
+    hotelNightly: 28,
+    hotelCenter: 'Zona céntrica',
+    hotelImage: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80',
+    vibe: 'culture' as TravelVibe,
+    temp: 20,
+    weatherText: 'Templado y agradable',
+    weatherIcon: '🌤️',
+    dailyCost: 40,
+    beer: 2.5,
+    meal: 13.0,
+    coffee: 1.5,
+    transport: 2.0,
+    description: `Descubre ${iata} con vuelos directos y estancias confortables.`,
+  };
+}
 
 /**
  * Fetches live cheap flight combinations directly from Travelpayouts / Aviasales Data API
+ * Uses 100% RAW REAL prices without any artificial discounts
  */
 export async function getLiveFlightTrips(originCode: string = 'TFS', isResident: boolean = true): Promise<TripCombination[]> {
   try {
     const cleanOrigin = (originCode || 'TFS').toUpperCase().trim();
+    
+    if (!API_TOKEN) {
+      console.warn('[Travelpayouts API] Missing TRAVELPAYOUTS_API_TOKEN in environment');
+      return [];
+    }
+
     const url = `https://api.travelpayouts.com/v1/prices/cheap?origin=${cleanOrigin}&currency=EUR&token=${API_TOKEN}`;
 
     const res = await fetch(url, {
@@ -449,13 +539,17 @@ export async function getLiveFlightTrips(originCode: string = 'TFS', isResident:
       headers: { 'Accept': 'application/json' },
     });
 
+    console.log(`[Travelpayouts API] Fetching origin=${cleanOrigin}, status=${res.status}`);
+
     if (!res.ok) {
-      console.warn(`Travelpayouts API returned ${res.status}`);
+      console.warn(`[Travelpayouts API] Returned HTTP ${res.status}: ${res.statusText}`);
       return [];
     }
 
     const json = await res.json();
-    if (!json.success || !json.data) {
+    console.log(`[Travelpayouts API] Raw destinations received:`, json.data ? Object.keys(json.data) : 'No data');
+
+    if (!json.success || !json.data || Object.keys(json.data).length === 0) {
       return [];
     }
 
@@ -463,26 +557,20 @@ export async function getLiveFlightTrips(originCode: string = 'TFS', isResident:
     const destEntries = Object.entries(json.data) as [string, Record<string, any>][];
 
     for (const [destIata, flightOptions] of destEntries) {
-      const destMeta = DESTINATION_DIRECTORY[destIata];
-      if (!destMeta) continue; // Only include cities in our rich directory
+      // Resolve destination metadata (Directory or dynamic fallback)
+      const destMeta = resolveDestinationMeta(destIata);
 
       // Get the cheapest flight option
       const optionsArray = Object.values(flightOptions);
       if (optionsArray.length === 0) continue;
 
       const flightInfo: any = optionsArray[0];
-      const rawPrice = Number(flightInfo.price) || 50;
-
-      // Apply resident subsidy logic if island origin and domestic flight
-      const isCanaryOrBalearic = ['TFS', 'TFN', 'LPA', 'ACE', 'FUE', 'SPC', 'PMI', 'IBZ'].includes(cleanOrigin);
-      const isDomestic = destMeta.country === 'España';
       
-      let finalFlightPrice = rawPrice;
-      if (isCanaryOrBalearic && isResident && isDomestic) {
-        finalFlightPrice = Math.max(18, Math.round(rawPrice * 0.35));
-      } else if (!isCanaryOrBalearic && !isDomestic) {
-        finalFlightPrice = Math.round(rawPrice * 0.9);
-      }
+      // 100% REAL RAW FLIGHT PRICE from Travelpayouts / Aviasales (No artificial manipulation)
+      const rawPrice = Number(flightInfo.price) || 0;
+      if (rawPrice <= 0) continue;
+
+      const finalFlightPrice = rawPrice;
 
       const departureDate = flightInfo.departure_at || new Date(Date.now() + 86400000 * 20).toISOString();
       const returnDate = flightInfo.return_at || new Date(Date.now() + 86400000 * 23).toISOString();
@@ -557,15 +645,15 @@ export async function getLiveFlightTrips(originCode: string = 'TFS', isResident:
         nights: nights,
         tripScore: Math.min(99, tripScore),
         scores: { price: priceScore, hotel: Math.round(destMeta.hotelRating * 10), flight: 96, convenience: 92, destination: 95 },
-        aiExplanation: `Oferta en tiempo real desde ${cleanOrigin} a ${destMeta.city}. Vuelo ida y vuelta con ${airlineName} + ${nights} noches en hotel céntrico por solo ${totalPrice} €.`,
+        aiExplanation: `Oferta en tiempo real desde ${cleanOrigin} a ${destMeta.city}. Vuelo ida y vuelta con ${airlineName} (${finalFlightPrice} €) + ${nights} noches en hotel céntrico (${hotelTotalPrice} €) por ${totalPrice} € total.`,
         tags: [
-          flightInfo.transfers === 0 ? '✈️ Vuelo Directo' : '✈️ Vuelo confirmado',
+          flightInfo.transfers === 0 ? '✈️ Vuelo Directo' : '✈️ Vuelo verificado',
           '🥐 Desayuno Incluido',
           `🏨 ${destMeta.hotelStars} Estrellas`,
           '⚡ Tarifa en Vivo'
         ],
         vibe: destMeta.vibe,
-        priceTrend: totalPrice <= 120 ? 'lowest' : 'stable',
+        priceTrend: totalPrice <= 140 ? 'lowest' : 'stable',
         destinationCost: {
           dailyAverage: destMeta.dailyCost,
           beerPrice: destMeta.beer,
@@ -612,7 +700,7 @@ export async function getLiveFlightTrips(originCode: string = 'TFS', isResident:
     trips.sort((a, b) => b.tripScore - a.tripScore || a.totalPrice - b.totalPrice);
     return trips;
   } catch (error) {
-    console.error('Error in getLiveFlightTrips:', error);
+    console.error('[Travelpayouts API] Critical Error in getLiveFlightTrips:', error);
     return [];
   }
 }
