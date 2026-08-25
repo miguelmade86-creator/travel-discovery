@@ -10,6 +10,7 @@ interface SearchSummaryBarProps {
   nights?: number;
   budget?: number;
   isResident?: boolean;
+  source?: 'live' | 'mock' | 'empty';
   usingMockData?: boolean;
 }
 
@@ -19,10 +20,12 @@ export default function SearchSummaryBar({
   nights = 3,
   budget = 150,
   isResident = true,
+  source = 'live',
   usingMockData = false,
 }: SearchSummaryBarProps) {
   const airport = ALL_AIRPORTS.find((a) => a.code === originCode);
   const originName = airport ? `${airport.name} (${airport.code})` : originCode;
+  const isLive = source === 'live' && !usingMockData;
 
   return (
     <div className="w-full py-2.5 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -74,13 +77,13 @@ export default function SearchSummaryBar({
           </div>
 
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold">
-            {usingMockData ? (
-              <span className="text-td-muted bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full">
-                ℹ️ Ejemplos orientativos
+            {isLive ? (
+              <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                ⚡ Tarifas en Vivo
               </span>
             ) : (
-              <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                ⚡ Tarifas en Vivo
+              <span className="text-td-muted bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full">
+                ℹ️ Ejemplos orientativos
               </span>
             )}
           </div>

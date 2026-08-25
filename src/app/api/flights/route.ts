@@ -20,12 +20,13 @@ export async function GET(request: NextRequest) {
       success: true,
       count: filtered.length,
       origin: origin,
+      source: filtered.length > 0 ? 'live' : 'empty',
       data: filtered,
     });
   } catch (error) {
     console.error('API Flights Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch live flight trips' },
+      { success: false, source: 'empty', error: 'Failed to fetch live flight trips' },
       { status: 500 }
     );
   }

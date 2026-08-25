@@ -140,6 +140,7 @@ function ResultsContent() {
           nights={paramNights}
           budget={budget}
           isResident={paramResident}
+          source={source}
           usingMockData={usingMockData}
         />
 
