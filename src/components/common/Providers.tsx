@@ -8,14 +8,12 @@ import ToastNotification from './ToastNotification';
 import CookieBanner from '@/components/layout/CookieBanner';
 import AuthModal from '@/components/auth/AuthModal';
 import PlaneCursor from './PlaneCursor';
-import FlightProgressBar from './FlightProgressBar';
 import FlightPageTransition from './FlightPageTransition';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <UserProvider>
       <Suspense fallback={null}>
-        <FlightProgressBar />
         <FlightPageTransition />
       </Suspense>
       {children}
