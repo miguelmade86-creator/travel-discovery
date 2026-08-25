@@ -17,6 +17,8 @@ interface PriceBreakdownProps {
   hotelName?: string;
   carPrice?: number;
   carAdded?: boolean;
+  insurancePrice?: number;
+  insuranceAdded?: boolean;
 }
 
 export default function PriceBreakdown({
@@ -30,6 +32,8 @@ export default function PriceBreakdown({
   hotelName = 'Hotel',
   carPrice = 0,
   carAdded = false,
+  insurancePrice = 0,
+  insuranceAdded = false,
 }: PriceBreakdownProps) {
   const [selectedActivities, setSelectedActivities] = useState<number[]>([]);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -44,7 +48,7 @@ export default function PriceBreakdown({
     return acc + (activities ? activities[idx]?.price || 0 : 0);
   }, 0);
 
-  const grandTotal = totalPrice + activitiesCost + (carAdded ? carPrice : 0);
+  const grandTotal = totalPrice + activitiesCost + (carAdded ? carPrice : 0) + (insuranceAdded ? insurancePrice : 0);
   const budgetPercentage = Math.min(100, Math.round((grandTotal / budget) * 100));
   const isOverBudget = grandTotal > budget;
   const barColor = isOverBudget ? 'bg-td-coral' : 'bg-td-emerald';
@@ -81,6 +85,13 @@ export default function PriceBreakdown({
             <div className="flex justify-between items-center text-xs sm:text-sm text-emerald-400 font-semibold pt-2 border-t border-white/5">
               <span className="flex items-center gap-1.5">🚗 Coche de alquiler</span>
               <span>+{carPrice} €</span>
+            </div>
+          )}
+
+          {insuranceAdded && (
+            <div className="flex justify-between items-center text-xs sm:text-sm text-cyan-300 font-semibold pt-2 border-t border-white/5">
+              <span className="flex items-center gap-1.5">🛡️ Seguro de viaje IATI</span>
+              <span>+{insurancePrice} €</span>
             </div>
           )}
 

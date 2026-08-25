@@ -8,6 +8,9 @@ import NavigationChartBackground from '@/components/home/NavigationChartBackgrou
 import SurpriseMeModal from '@/components/home/SurpriseMeModal';
 import PopularDestinations from '@/components/home/PopularDestinations';
 import TrustStatsBar from '@/components/home/TrustStatsBar';
+import FlashDealsSection from '@/components/home/FlashDealsSection';
+import HolidayPlannerSection from '@/components/home/HolidayPlannerSection';
+import CommunityVipBanner from '@/components/home/CommunityVipBanner';
 import QuickCategoryPills from '@/components/home/QuickCategoryPills';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import FAQSection from '@/components/home/FAQSection';
@@ -207,8 +210,18 @@ export default function Home() {
            ========================================================================= */}
         <TrustStatsBar />
 
+        {/* =========================================================================
+            VIRAL FLASH DEALS UNDER 99€
+           ========================================================================= */}
+        <FlashDealsSection />
+
         {/* POPULAR DESTINATIONS CAROUSEL */}
         <PopularDestinations />
+
+        {/* =========================================================================
+            SMART SPANISH BANK HOLIDAYS & LONG WEEKENDS PLANNER
+           ========================================================================= */}
+        <HolidayPlannerSection />
 
         {/* HOW IT WORKS SECTION */}
         <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white/[0.01] border-t border-white/5 relative">
@@ -264,6 +277,11 @@ export default function Home() {
 
         {/* TESTIMONIALS & SOCIAL PROOF */}
         <TestimonialsSection />
+
+        {/* =========================================================================
+            VIP COMMUNITY LEAD CAPTURE (WHATSAPP & TELEGRAM DEAL CHANNELS)
+           ========================================================================= */}
+        <CommunityVipBanner />
 
         {/* FAQS SECTION */}
         <FAQSection />

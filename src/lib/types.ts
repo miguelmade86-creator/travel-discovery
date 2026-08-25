@@ -234,11 +234,26 @@ export const TRAVEL_VIBES = [
   { id: 'romantic', label: 'Escapada Romántica 💑', emoji: '💑' },
 ];
 
-export const CANARY_HOLIDAYS = [
-  { id: 'pilar', name: 'Puente del Pilar', dates: '10 - 13 Octubre', days: 4, month: 'Octubre', emoji: '🎉' },
-  { id: 'santos', name: 'Todos los Santos', dates: '31 Oct - 3 Nov', days: 4, month: 'Noviembre', emoji: '🎃' },
-  { id: 'constitucion', name: 'Puente Constitución', dates: '5 - 9 Diciembre', days: 5, month: 'Diciembre', emoji: '🎄' },
-  { id: 'reyes', name: 'Fin de Año / Reyes', dates: '30 Dic - 2 Ene', days: 4, month: 'Diciembre', emoji: '✨' },
-  { id: 'carnaval', name: 'Carnavales', dates: '27 Feb - 3 Mar', days: 5, month: 'Febrero', emoji: '🎭' },
-  { id: 'semana-santa', name: 'Semana Santa', dates: '16 - 20 Abril', days: 5, month: 'Abril', emoji: '☀️' },
+export interface HolidayItem {
+  id: string;
+  name: string;
+  dates: string;
+  days: number;
+  month: string;
+  emoji: string;
+  scope: 'national' | 'canarias' | 'madrid' | 'andalucia';
+  scopeLabel: string;
+  badge?: string;
+}
+
+export const SPANISH_HOLIDAYS: HolidayItem[] = [
+  { id: 'constitucion', name: 'Puente de la Constitución', dates: '5 - 9 Diciembre', days: 4, month: 'Diciembre', emoji: '🎄', scope: 'national', scopeLabel: '🇪🇸 Macropuente Nacional', badge: '🔥 Más buscado' },
+  { id: 'semana-santa', name: 'Semana Santa', dates: '16 - 20 Abril', days: 5, month: 'Abril', emoji: '☀️', scope: 'national', scopeLabel: '🇪🇸 Toda España' },
+  { id: 'pilar', name: 'Puente del Pilar / Hispanidad', dates: '10 - 13 Octubre', days: 4, month: 'Octubre', emoji: '🎉', scope: 'national', scopeLabel: '🇪🇸 Nacional' },
+  { id: 'santos', name: 'Todos los Santos', dates: '31 Oct - 3 Nov', days: 3, month: 'Noviembre', emoji: '🎃', scope: 'national', scopeLabel: '🇪🇸 Otoño' },
+  { id: 'reyes', name: 'Fin de Año & Reyes', dates: '30 Dic - 3 Ene', days: 4, month: 'Diciembre', emoji: '✨', scope: 'national', scopeLabel: '🇪🇸 Fin de Año' },
+  { id: 'carnaval', name: 'Carnavales', dates: '27 Feb - 3 Mar', days: 5, month: 'Febrero', emoji: '🎭', scope: 'canarias', scopeLabel: '🌴 Canarias & Cádiz' },
+  { id: 'puente-mayo', name: 'Puente de Mayo', dates: '1 - 4 Mayo', days: 4, month: 'Mayo', emoji: '🌸', scope: 'national', scopeLabel: '🇪🇸 Primavera' },
 ];
+
+export const CANARY_HOLIDAYS = SPANISH_HOLIDAYS;

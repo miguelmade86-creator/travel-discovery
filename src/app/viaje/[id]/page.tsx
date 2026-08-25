@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer';
 import FlightCard from '@/components/trip/FlightCard';
 import HotelCard from '@/components/trip/HotelCard';
 import CarRentalCard from '@/components/trip/CarRentalCard';
+import TravelInsuranceCard from '@/components/trip/TravelInsuranceCard';
 import PriceBreakdown from '@/components/trip/PriceBreakdown';
 import TripHeader from '@/components/trip/TripHeader';
 import ShareCard from '@/components/trip/ShareCard';
@@ -22,6 +23,8 @@ export default function TripDetailPage() {
   const id = params.id as string;
   const [carAdded, setCarAdded] = useState(false);
   const [carPrice, setCarPrice] = useState(0);
+  const [insuranceAdded, setInsuranceAdded] = useState(false);
+  const [insurancePrice, setInsurancePrice] = useState(0);
 
   const trip = MOCK_TRIPS.find((t) => t.id === id);
 
@@ -116,6 +119,17 @@ export default function TripDetailPage() {
                 }}
               />
 
+              {/* Optional Travel Insurance Add-on Card (IATI / Travelpayouts) */}
+              <TravelInsuranceCard
+                country={trip.destination.country}
+                city={trip.destination.city}
+                nights={trip.nights}
+                onToggleInsurance={(added, price) => {
+                  setInsuranceAdded(added);
+                  setInsurancePrice(added ? price : 0);
+                }}
+              />
+
               {/* Destination Living Cost Calculator (Real True Cost) */}
               <DestinationCostCard
                 cost={trip.destinationCost}
@@ -192,6 +206,8 @@ export default function TripDetailPage() {
                 hotelName={trip.hotel.name}
                 carPrice={carPrice}
                 carAdded={carAdded}
+                insurancePrice={insurancePrice}
+                insuranceAdded={insuranceAdded}
               />
             </div>
 
@@ -202,10 +218,10 @@ export default function TripDetailPage() {
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0F1A]/95 backdrop-blur-2xl border-t border-white/15 p-4 shadow-2xl flex items-center justify-between">
           <div>
             <div className="text-[10px] text-td-muted uppercase font-bold">
-              Total {trip.hotel.isAirbnb ? 'Airbnb' : 'Hotel'} + Vuelo {carAdded ? '+ Coche' : ''}
+              Total {trip.hotel.isAirbnb ? 'Airbnb' : 'Hotel'} + Vuelo {carAdded ? '+ Coche' : ''} {insuranceAdded ? '+ Seguro' : ''}
             </div>
             <div className="text-xl font-black td-gradient-text leading-tight">
-              {finalDisplayTotal} € <span className="text-xs text-td-muted font-normal">/ pers.</span>
+              {trip.totalPrice + (carAdded ? carPrice : 0) + (insuranceAdded ? insurancePrice : 0)} € <span className="text-xs text-td-muted font-normal">/ pers.</span>
             </div>
           </div>
           <a

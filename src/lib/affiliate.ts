@@ -1,10 +1,10 @@
 // =========================================================================
 // TRAVELDISCOVERY — CENTRALIZED AFFILIATE ENGINE (OPTION A)
-// Supports Travelpayouts (Kiwi/Aviasales/Booking), Civitatis, and Direct Booking
+// Supports Travelpayouts (Kiwi/Aviasales/Booking/DiscoverCars/IATI), Civitatis, and Direct Booking
 // =========================================================================
 
 export const AFFILIATE_CONFIG = {
-  // Travelpayouts Marker (All-in-One: Kiwi, Aviasales, WayAway, Hotellook, Booking)
+  // Travelpayouts Marker (All-in-One: Kiwi, Aviasales, WayAway, Hotellook, Booking, DiscoverCars, IATI/Heymondo)
   travelpayoutsMarker: process.env.NEXT_PUBLIC_TRAVELPAYOUTS_MARKER || '612890',
   
   // Civitatis Affiliate Partner ID (Direct Tours & Activities)
@@ -12,6 +12,10 @@ export const AFFILIATE_CONFIG = {
   
   // Booking.com Direct Affiliate AID (if using direct Booking partner program)
   bookingAid: process.env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID || '2418902',
+
+  // VIP Community Channels (WhatsApp & Telegram)
+  whatsappChannelUrl: process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || 'https://whatsapp.com/channel/0029VaTravelDiscovery',
+  telegramChannelUrl: process.env.NEXT_PUBLIC_TELEGRAM_CHANNEL_URL || 'https://t.me/traveldiscovery_chollos',
 };
 
 /**
@@ -134,6 +138,24 @@ export function getCarRentalAffiliateUrl(
   if (returnDate) {
     params.set('return_date', returnDate.split('T')[0]);
   }
+
+  return `${baseUrl}?${params.toString()}`;
+}
+
+/**
+ * Builds a Travel Insurance affiliate deeplink (IATI / Heymondo via Travelpayouts)
+ */
+export function getTravelInsuranceAffiliateUrl(
+  destinationCountry: string,
+  tripDays: number = 3
+): string {
+  const baseUrl = 'https://www.iatiseguros.com/';
+  const params = new URLSearchParams({
+    r: AFFILIATE_CONFIG.travelpayoutsMarker,
+    destino: destinationCountry,
+    dias: tripDays.toString(),
+    distribuidor: 'traveldiscovery',
+  });
 
   return `${baseUrl}?${params.toString()}`;
 }
