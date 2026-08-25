@@ -84,18 +84,13 @@ export function getFlightBookingAffiliateUrl(
   departureDate?: string,
   returnDate?: string
 ): string {
-  const dep = departureDate ? departureDate.split('T')[0] : '';
-  const ret = returnDate ? returnDate.split('T')[0] : '';
+  const origin = (originCode || 'TFS').toLowerCase().trim();
+  const dest = (destCode || 'BCN').toLowerCase().trim();
+  const dep = departureDate ? departureDate.split('T')[0] : 'anytime';
+  const ret = returnDate ? returnDate.split('T')[0] : 'anytime';
 
-  // Kiwi.com with Travelpayouts affiliate tracking
-  const kiwiUrl = new URL('https://www.kiwi.com/es/search/results');
-  kiwiUrl.pathname = `/es/search/results/${originCode.toLowerCase()}/${destCode.toLowerCase()}/${dep || 'anytime'}/${ret || 'anytime'}`;
-  
-  // Inject Travelpayouts marker / affiliate tag
-  kiwiUrl.searchParams.set('affilid', AFFILIATE_CONFIG.travelpayoutsMarker);
-  kiwiUrl.searchParams.set('marker', AFFILIATE_CONFIG.travelpayoutsMarker);
-
-  return kiwiUrl.toString();
+  // Direct Kiwi search URL with Travelpayouts affiliate tracking
+  return `https://www.kiwi.com/es/search/results/${origin}/${dest}/${dep}/${ret}?affilid=${AFFILIATE_CONFIG.travelpayoutsMarker}&marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
 }
 
 /**

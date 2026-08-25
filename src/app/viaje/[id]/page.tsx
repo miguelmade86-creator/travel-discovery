@@ -202,7 +202,10 @@ export default function TripDetailPage() {
                 budget={demoBudget}
                 activities={trip.activities}
                 destinationCity={trip.destination.city}
+                destCode={trip.outboundFlight.destination.code}
                 originCode={trip.outboundFlight.origin.code}
+                departureDate={trip.outboundFlight.departure}
+                returnDate={trip.returnFlight.departure}
                 hotelName={trip.hotel.name}
                 carPrice={carPrice}
                 carAdded={carAdded}

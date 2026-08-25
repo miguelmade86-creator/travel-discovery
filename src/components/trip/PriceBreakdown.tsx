@@ -13,7 +13,10 @@ interface PriceBreakdownProps {
   budget: number;
   activities?: ActivitySuggestion[];
   destinationCity?: string;
+  destCode?: string;
   originCode?: string;
+  departureDate?: string;
+  returnDate?: string;
   hotelName?: string;
   carPrice?: number;
   carAdded?: boolean;
@@ -28,7 +31,10 @@ export default function PriceBreakdown({
   budget,
   activities,
   destinationCity = 'Europa',
+  destCode = 'BCN',
   originCode = 'TFS',
+  departureDate,
+  returnDate,
   hotelName = 'Hotel',
   carPrice = 0,
   carAdded = false,
@@ -53,8 +59,8 @@ export default function PriceBreakdown({
   const isOverBudget = grandTotal > budget;
   const barColor = isOverBudget ? 'bg-td-coral' : 'bg-td-emerald';
 
-  const flightBookingUrl = getFlightBookingAffiliateUrl(originCode, 'DEST');
-  const hotelBookingUrl = getBookingAffiliateUrl(hotelName, destinationCity);
+  const flightBookingUrl = getFlightBookingAffiliateUrl(originCode, destCode, departureDate, returnDate);
+  const hotelBookingUrl = getBookingAffiliateUrl(hotelName, destinationCity, departureDate, returnDate);
 
   return (
     <>
