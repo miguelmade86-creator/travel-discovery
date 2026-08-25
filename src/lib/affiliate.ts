@@ -27,27 +27,28 @@ export function getBookingAffiliateUrl(
   checkInDate?: string,
   checkOutDate?: string
 ): string {
-  const query = `${hotelName} ${cityName}`.trim();
+  // Strip unicode star characters like 4★ so Booking search doesn't break
+  const cleanHotel = (hotelName || '').replace(/[★*]/g, '').trim();
+  const cleanCity = (cityName || 'España').trim();
+  const searchQuery = cleanHotel ? `${cleanHotel}, ${cleanCity}` : cleanCity;
+
   const baseUrl = 'https://www.booking.com/searchresults.es.html';
-  
   const params = new URLSearchParams({
-    ss: query,
-    aid: AFFILIATE_CONFIG.bookingAid,
-    label: `td_hotel_${encodeURIComponent(cityName.toLowerCase())}`,
+    ss: searchQuery,
+    aid: AFFILIATE_CONFIG.bookingAid || '2418902',
+    label: `td_${encodeURIComponent(cleanCity.toLowerCase())}`,
+    group_adults: '2',
+    no_rooms: '1',
+    group_children: '0',
   });
 
   if (checkInDate) {
-    const d = new Date(checkInDate);
-    params.set('checkin_year', d.getFullYear().toString());
-    params.set('checkin_month', (d.getMonth() + 1).toString());
-    params.set('checkin_monthday', d.getDate().toString());
+    const dep = checkInDate.split('T')[0];
+    if (dep) params.set('checkin', dep);
   }
-
   if (checkOutDate) {
-    const d = new Date(checkOutDate);
-    params.set('checkout_year', d.getFullYear().toString());
-    params.set('checkout_month', (d.getMonth() + 1).toString());
-    params.set('checkout_monthday', d.getDate().toString());
+    const ret = checkOutDate.split('T')[0];
+    if (ret) params.set('checkout', ret);
   }
 
   return `${baseUrl}?${params.toString()}`;
