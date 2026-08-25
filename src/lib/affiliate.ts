@@ -84,13 +84,51 @@ export function getFlightBookingAffiliateUrl(
   departureDate?: string,
   returnDate?: string
 ): string {
-  const origin = (originCode || 'TFS').toLowerCase().trim();
-  const dest = (destCode || 'BCN').toLowerCase().trim();
-  const dep = departureDate ? departureDate.split('T')[0] : 'anytime';
-  const ret = returnDate ? returnDate.split('T')[0] : 'anytime';
+  const origin = (originCode || 'TFS').toUpperCase().trim();
+  const dest = (destCode || 'BCN').toUpperCase().trim();
+  const dep = departureDate ? departureDate.split('T')[0] : '';
+  const ret = returnDate ? returnDate.split('T')[0] : '';
 
-  // Direct Kiwi search URL with Travelpayouts affiliate tracking
-  return `https://www.kiwi.com/es/search/results/${origin}/${dest}/${dep}/${ret}?affilid=${AFFILIATE_CONFIG.travelpayoutsMarker}&marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
+  // Kiwi official deep link handler (pre-fills origin, destination, dates, and tracks affiliate marker)
+  const kiwiUrl = new URL('https://www.kiwi.com/deep');
+  kiwiUrl.searchParams.set('from', origin);
+  kiwiUrl.searchParams.set('to', dest);
+  if (dep) kiwiUrl.searchParams.set('departure', dep);
+  if (ret) kiwiUrl.searchParams.set('return', ret);
+  kiwiUrl.searchParams.set('affilid', AFFILIATE_CONFIG.travelpayoutsMarker);
+  kiwiUrl.searchParams.set('lang', 'es');
+  kiwiUrl.searchParams.set('currency', 'EUR');
+
+  return kiwiUrl.toString();
+}
+
+/**
+ * Builds an Aviasales direct flight search link with Travelpayouts marker
+ */
+export function getAviasalesAffiliateUrl(
+  originCode: string,
+  destCode: string,
+  departureDate?: string,
+  returnDate?: string
+): string {
+  const origin = (originCode || 'TFS').toUpperCase().trim();
+  const dest = (destCode || 'BCN').toUpperCase().trim();
+  
+  const formatDateDayMonth = (isoDate: string) => {
+    const d = new Date(isoDate);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${day}${month}`;
+  };
+
+  const depStr = departureDate ? formatDateDayMonth(departureDate) : '';
+  const retStr = returnDate ? formatDateDayMonth(returnDate) : '';
+
+  if (depStr && retStr) {
+    return `https://www.aviasales.es/search/${origin}${depStr}${dest}${retStr}1?marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
+  }
+
+  return `https://www.aviasales.es/search/${origin}${dest}1?marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
 }
 
 /**

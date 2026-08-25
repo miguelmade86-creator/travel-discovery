@@ -26,7 +26,15 @@ export default function TripDetailPage() {
   const [insuranceAdded, setInsuranceAdded] = useState(false);
   const [insurancePrice, setInsurancePrice] = useState(0);
 
-  const trip = MOCK_TRIPS.find((t) => t.id === id);
+  // Match by exact ID or by destination IATA / city slug
+  let trip = MOCK_TRIPS.find((t) => t.id === id);
+  if (!trip && id) {
+    const cleanId = id.toLowerCase();
+    trip = MOCK_TRIPS.find((t) => 
+      cleanId.includes(t.outboundFlight.destination.code.toLowerCase()) || 
+      cleanId.includes(t.destination.city.toLowerCase())
+    );
+  }
 
   if (!trip) {
     return (
