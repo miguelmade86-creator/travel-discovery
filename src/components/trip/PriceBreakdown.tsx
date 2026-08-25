@@ -239,7 +239,7 @@ export default function PriceBreakdown({
                       <h4 className="text-sm font-bold text-white group-hover:text-td-coral transition-colors">
                         Paso 1: Reservar Vuelo ({flightPrice} €)
                       </h4>
-                      <p className="text-[11px] text-td-muted">Vuelo directo ida y vuelta verificado</p>
+                      <p className="text-[11px] text-td-muted">Tarifa de vuelo ida y vuelta en tiempo real</p>
                     </div>
                   </div>
                   <ExternalLink className="w-4 h-4 text-td-muted group-hover:text-white" />
@@ -258,9 +258,9 @@ export default function PriceBreakdown({
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-white group-hover:text-td-amber transition-colors">
-                        Paso 2: Reservar Hotel ({hotelPrice} €)
+                        Paso 2: Reservar Alojamiento ({hotelPrice} €)
                       </h4>
-                      <p className="text-[11px] text-td-muted">{hotelName} · Cancelación gratis</p>
+                      <p className="text-[11px] text-td-muted">Hotel recomendado en Booking.com · Cancelación flexible</p>
                     </div>
                   </div>
                   <ExternalLink className="w-4 h-4 text-td-muted group-hover:text-white" />

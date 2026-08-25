@@ -181,7 +181,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('td_favorites', JSON.stringify(updated));
       } catch {}
       
-      const trip = MOCK_TRIPS.find((t) => t.id === tripId);
+      const cleanId = tripId.toLowerCase();
+      const trip = MOCK_TRIPS.find((t) => t.id === tripId || cleanId.includes(t.outboundFlight.destination.code.toLowerCase()) || cleanId.includes(t.destination.city.toLowerCase()));
       const name = trip ? trip.destination.city : 'Escapada';
       showToast(exists ? `❌ Eliminado de favoritos: ${name}` : `❤️ Guardado en favoritos: ${name}`);
       return updated;
@@ -190,7 +191,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const isFavorite = (tripId: string) => favorites.includes(tripId);
 
-  const favoriteTrips = MOCK_TRIPS.filter((t) => favorites.includes(t.id));
+  const favoriteTrips = MOCK_TRIPS.filter((t) => {
+    const cleanId = t.id.toLowerCase();
+    return favorites.some((fav) => fav === t.id || fav.toLowerCase().includes(t.outboundFlight.destination.code.toLowerCase()) || fav.toLowerCase().includes(t.destination.city.toLowerCase()));
+  });
 
   const addAlert = (trip: TripCombination, maxBudget: number, email: string) => {
     const newAlert: PriceAlert = {

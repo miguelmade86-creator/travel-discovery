@@ -54,7 +54,7 @@ export default function HotelCard({ hotel, nights, checkIn, checkOut, destinatio
               : 'bg-td-coral text-[#0B0F1A]'
           }`}>
             {isAirbnb ? <Home className="w-3.5 h-3.5" /> : <span>🏨</span>}
-            <span>{isAirbnb ? 'Airbnb Superhost' : 'Hotel Verificado'}</span>
+            <span>{isAirbnb ? 'Apartamento Airbnb' : 'Hotel recomendado'}</span>
           </span>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function HotelCard({ hotel, nights, checkIn, checkOut, destinatio
               <span>{hotel.distanceFromCenter}</span>
             </span>
             <span>·</span>
-            <span>{hotel.reviewCount.toLocaleString('es-ES')} opiniones verificadas</span>
+            <span>{hotel.reviewCount.toLocaleString('es-ES')} opiniones de viajeros</span>
           </div>
         </div>
 
@@ -119,11 +119,11 @@ export default function HotelCard({ hotel, nights, checkIn, checkOut, destinatio
               {nights} noches ({formatDate(checkIn)} - {formatDate(checkOut)})
             </div>
             <div className="text-base font-bold text-white">
-              {isAirbnb ? '🏡 Total Airbnb:' : '🏨 Total Hotel:'}{' '}
+              {isAirbnb ? '🏡 Estancia estimada:' : '🏨 Estancia estimada:'}{' '}
               <span className="font-black text-xl td-gradient-text">{hotel.totalPrice} €</span>
             </div>
             <div className="text-[11px] text-td-muted mt-0.5">
-              ({hotel.nightlyRate} € / noche)
+              (~{hotel.nightlyRate} € / noche)
             </div>
           </div>
           

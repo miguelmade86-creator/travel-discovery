@@ -74,7 +74,7 @@ export default function TerminosPage() {
               <span className="text-td-coral">3.</span> Exactitud de Precios, Tarifas Dinámicas y Disponibilidad
             </h2>
             <p>
-              Los precios de vuelos y hoteles mostrados en TravelDiscovery se obtienen a través de APIs de agregación y cachés inteligentes optimizadas. Las tarifas aéreas y las disponibilidades hoteleras fluctúan en tiempo real según la oferta y demanda de las aerolíneas y alojamientos.
+              Los precios de vuelos mostrados en TravelDiscovery se obtienen a través de la API oficial de Travelpayouts / Aviasales en tiempo real. Los importes de alojamiento mostrados en la plataforma son recomendaciones y estimaciones orientativas basadas en medias hoteleras céntricas, enlazando directamente a proveedores oficiales (como Booking.com) para la consulta de disponibilidad y tarifas finales exactas en el momento de la reserva.
             </p>
             <p className="mt-2">
               Aunque TravelDiscovery realiza esfuerzos constantes para mantener la máxima fidelidad y frescura en los datos, <strong>el precio final vinculante es exclusivamente el confirmado por el proveedor final</strong> (aerolínea o Booking.com) en el momento exacto en que el usuario formaliza la reserva en su respectivo sitio web.

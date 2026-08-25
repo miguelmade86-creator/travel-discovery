@@ -10,6 +10,7 @@ interface SearchSummaryBarProps {
   nights?: number;
   budget?: number;
   isResident?: boolean;
+  usingMockData?: boolean;
 }
 
 export default function SearchSummaryBar({
@@ -18,6 +19,7 @@ export default function SearchSummaryBar({
   nights = 3,
   budget = 150,
   isResident = true,
+  usingMockData = false,
 }: SearchSummaryBarProps) {
   const airport = ALL_AIRPORTS.find((a) => a.code === originCode);
   const originName = airport ? `${airport.name} (${airport.code})` : originCode;
@@ -68,6 +70,18 @@ export default function SearchSummaryBar({
                 <span className="text-xs">🇪🇸</span>
                 <span className="text-white font-medium">Tarifa Peninsular</span>
               </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold">
+            {usingMockData ? (
+              <span className="text-td-muted bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full">
+                ℹ️ Ejemplos orientativos
+              </span>
+            ) : (
+              <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                ⚡ Tarifas en Vivo
+              </span>
             )}
           </div>
         </div>

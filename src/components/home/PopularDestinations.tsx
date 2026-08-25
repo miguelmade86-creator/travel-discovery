@@ -5,31 +5,53 @@ import { POPULAR_DESTINATIONS } from '@/lib/mock-data';
 import { TripCombination } from '@/lib/types';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight, Compass, Star, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Compass, Star } from 'lucide-react';
 
 interface PopularDestinationsProps {
   origin?: string;
   isResident?: boolean;
+  nights?: number;
+  month?: string;
 }
 
-export default function PopularDestinations({ origin = 'TFS', isResident = true }: PopularDestinationsProps) {
+export default function PopularDestinations({
+  origin = 'TFS',
+  isResident = true,
+  nights = 3,
+  month = 'Octubre',
+}: PopularDestinationsProps) {
   const [liveTrips, setLiveTrips] = useState<TripCombination[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    fetch(`/api/flights?origin=${origin}&resident=${isResident}`)
+    setIsLoading(true);
+
+    const query = new URLSearchParams({
+      origin: origin,
+      resident: isResident ? 'true' : 'false',
+      nights: nights.toString(),
+      month: month,
+    });
+
+    fetch(`/api/flights?${query.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
           setLiveTrips(data.data.slice(0, 8));
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [origin, isResident]);
+  }, [origin, isResident, nights, month]);
+
+  const usingMockData = liveTrips.length === 0 && !isLoading;
 
   // If live trips from API are ready, display them; otherwise display base destinations
   const displayItems = liveTrips.length > 0
@@ -57,9 +79,19 @@ export default function PopularDestinations({ origin = 'TFS', isResident = true 
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-td-coral/10 border border-td-coral/20 text-xs text-td-coral font-bold uppercase tracking-wider mb-3">
+            <div
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3 ${
+                usingMockData
+                  ? 'bg-white/5 border border-white/10 text-td-secondary'
+                  : 'bg-td-coral/10 border border-td-coral/20 text-td-coral'
+              }`}
+            >
               <Compass className="w-3.5 h-3.5" />
-              <span>Tarifas en Vivo · Salida desde {origin}</span>
+              <span>
+                {usingMockData
+                  ? `Ejemplos orientativos · Salida desde ${origin}`
+                  : `⚡ Tarifas en Vivo · Salida desde ${origin}`}
+              </span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
               Escapadas más deseadas <span className="td-gradient-text">de toda España</span>
@@ -70,7 +102,7 @@ export default function PopularDestinations({ origin = 'TFS', isResident = true 
           </div>
 
           <Link
-            href={`/resultados?origin=${origin}&resident=${isResident}`}
+            href={`/resultados?origin=${origin}&resident=${isResident}&nights=${nights}&month=${encodeURIComponent(month)}`}
             className="td-pill text-xs font-bold text-white hover:text-td-coral flex items-center gap-2 self-start sm:self-auto py-2.5 px-5 shadow-md group"
           >
             <span>Ver todas las escapadas ({origin})</span>
@@ -89,7 +121,11 @@ export default function PopularDestinations({ origin = 'TFS', isResident = true 
               transition={{ delay: i * 0.05, duration: 0.5 }}
             >
               <Link
-                href={dest.tripId ? `/viaje/${dest.tripId}` : `/resultados?budget=${dest.from + 40}&origin=${origin}&resident=${isResident}`}
+                href={
+                  dest.tripId
+                    ? `/viaje/${dest.tripId}`
+                    : `/resultados?budget=${dest.from + 40}&origin=${origin}&resident=${isResident}&nights=${nights}&month=${encodeURIComponent(month)}`
+                }
                 className="relative h-80 rounded-[28px] overflow-hidden group block border border-white/10 shadow-xl td-glass-card-hover"
               >
                 {/* Background Image with Zoom on Hover */}
@@ -132,7 +168,7 @@ export default function PopularDestinations({ origin = 'TFS', isResident = true 
                         {dest.city}
                       </h3>
                       <p className="text-[11px] text-td-muted">
-                        {dest.airline} + 3 noches hotel
+                        {dest.airline} + {nights} noches hotel
                       </p>
                     </div>
 

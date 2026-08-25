@@ -523,23 +523,34 @@ function resolveDestinationMeta(iata: string) {
  * Fetches live cheap flight combinations directly from Travelpayouts / Aviasales Data API
  * Uses 100% RAW REAL prices without any artificial discounts
  */
-export async function getLiveFlightTrips(originCode: string = 'TFS', isResident: boolean = true): Promise<TripCombination[]> {
+export async function getLiveFlightTrips(
+  originCode: string = 'TFS',
+  isResident: boolean = true,
+  nights: number = 3,
+  departMonth?: string
+): Promise<TripCombination[]> {
   try {
     const cleanOrigin = (originCode || 'TFS').toUpperCase().trim();
+    const nightsCount = Number(nights) > 0 ? Number(nights) : 3;
     
     if (!API_TOKEN) {
       console.warn('[Travelpayouts API] Missing TRAVELPAYOUTS_API_TOKEN in environment');
       return [];
     }
 
-    const url = `https://api.travelpayouts.com/v1/prices/cheap?origin=${cleanOrigin}&currency=EUR&token=${API_TOKEN}`;
+    let url = `https://api.travelpayouts.com/v1/prices/cheap?origin=${cleanOrigin}&currency=EUR&token=${API_TOKEN}`;
+    
+    // Include depart_date (YYYY-MM) if valid
+    if (departMonth && /^\d{4}-\d{2}$/.test(departMonth)) {
+      url += `&depart_date=${departMonth}`;
+    }
 
     const res = await fetch(url, {
       next: { revalidate: 1800 }, // Cache 30 mins
       headers: { 'Accept': 'application/json' },
     });
 
-    console.log(`[Travelpayouts API] Fetching origin=${cleanOrigin}, status=${res.status}`);
+    console.log(`[Travelpayouts API] Fetching origin=${cleanOrigin}, nights=${nightsCount}, month=${departMonth || 'any'}, status=${res.status}`);
 
     if (!res.ok) {
       console.warn(`[Travelpayouts API] Returned HTTP ${res.status}: ${res.statusText}`);
@@ -573,14 +584,13 @@ export async function getLiveFlightTrips(originCode: string = 'TFS', isResident:
       const finalFlightPrice = rawPrice;
 
       const departureDate = flightInfo.departure_at || new Date(Date.now() + 86400000 * 20).toISOString();
-      const returnDate = flightInfo.return_at || new Date(Date.now() + 86400000 * 23).toISOString();
+      const returnDate = flightInfo.return_at || new Date(Date.now() + 86400000 * (20 + nightsCount)).toISOString();
 
       const airlineCode = flightInfo.airline || 'FR';
       const airlineName = AIRLINE_NAMES[airlineCode] || airlineCode;
       const flightNumber = `${airlineCode}${flightInfo.flight_number || '101'}`;
 
-      const nights = 3;
-      const hotelTotalPrice = destMeta.hotelNightly * nights;
+      const hotelTotalPrice = destMeta.hotelNightly * nightsCount;
       const totalPrice = finalFlightPrice + hotelTotalPrice;
 
       // Calculate TripScore (0 - 100)
@@ -642,10 +652,10 @@ export async function getLiveFlightTrips(originCode: string = 'TFS', isResident:
         flightPrice: finalFlightPrice,
         hotelPrice: hotelTotalPrice,
         totalPrice: totalPrice,
-        nights: nights,
+        nights: nightsCount,
         tripScore: Math.min(99, tripScore),
         scores: { price: priceScore, hotel: Math.round(destMeta.hotelRating * 10), flight: 96, convenience: 92, destination: 95 },
-        aiExplanation: `Oferta en tiempo real desde ${cleanOrigin} a ${destMeta.city}. Vuelo ida y vuelta con ${airlineName} (${finalFlightPrice} €) + ${nights} noches en hotel céntrico (${hotelTotalPrice} €) por ${totalPrice} € total.`,
+        aiExplanation: `Oferta en tiempo real desde ${cleanOrigin} a ${destMeta.city}. Vuelo ida y vuelta con ${airlineName} (${finalFlightPrice} €) + ${nightsCount} noches en hotel céntrico (${hotelTotalPrice} €) por ${totalPrice} € total.`,
         tags: [
           flightInfo.transfers === 0 ? '✈️ Vuelo Directo' : '✈️ Vuelo verificado',
           '🥐 Desayuno Incluido',

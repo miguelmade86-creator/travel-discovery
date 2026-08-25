@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { MOCK_TRIPS } from '@/lib/mock-data';
+import { TripCombination } from '@/lib/types';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FlightCard from '@/components/trip/FlightCard';
@@ -15,35 +16,95 @@ import ShareCard from '@/components/trip/ShareCard';
 import DestinationCostCard from '@/components/trip/DestinationCostCard';
 import ItineraryTimeline from '@/components/trip/ItineraryTimeline';
 import Link from 'next/link';
-import { ArrowLeft, Ticket, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Ticket, Loader2 } from 'lucide-react';
 import { getCivitatisAffiliateUrl } from '@/lib/affiliate';
 
 export default function TripDetailPage() {
   const params = useParams();
   const id = params.id as string;
+  const [trip, setTrip] = useState<TripCombination | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [carAdded, setCarAdded] = useState(false);
   const [carPrice, setCarPrice] = useState(0);
   const [insuranceAdded, setInsuranceAdded] = useState(false);
   const [insurancePrice, setInsurancePrice] = useState(0);
 
-  // Match by exact ID or by destination IATA / city slug
-  let trip = MOCK_TRIPS.find((t) => t.id === id);
-  if (!trip && id) {
-    const cleanId = id.toLowerCase();
-    trip = MOCK_TRIPS.find((t) => 
-      cleanId.includes(t.outboundFlight.destination.code.toLowerCase()) || 
-      cleanId.includes(t.destination.city.toLowerCase())
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+
+    const resolveTrip = async () => {
+      // 1. Check if ID follows dynamic format: trip-<destIata>-<origin>
+      const parts = (id || '').split('-');
+      if (parts.length >= 3 && parts[0] === 'trip') {
+        const destCode = parts[1].toUpperCase();
+        const originCode = parts[2].toUpperCase();
+
+        try {
+          const res = await fetch(`/api/flights?origin=${originCode}`);
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            const liveMatch = json.data.find(
+              (t: TripCombination) =>
+                t.id.toLowerCase() === id.toLowerCase() ||
+                t.outboundFlight.destination.code.toUpperCase() === destCode
+            );
+            if (liveMatch && isMounted) {
+              setTrip(liveMatch);
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('Error resolving live trip:', err);
+        }
+      }
+
+      // 2. Fallback to MOCK_TRIPS if dynamic fetch fails or if ID is a mock ID
+      if (isMounted) {
+        let mockMatch = MOCK_TRIPS.find((t) => t.id === id);
+        if (!mockMatch && id) {
+          const cleanId = id.toLowerCase();
+          mockMatch = MOCK_TRIPS.find((t) =>
+            cleanId.includes(t.outboundFlight.destination.code.toLowerCase()) ||
+            cleanId.includes(t.destination.city.toLowerCase())
+          );
+        }
+        setTrip(mockMatch || null);
+        setIsLoading(false);
+      }
+    };
+
+    resolveTrip();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#070A12] text-td-primary">
+        <Header />
+        <main className="flex-1 flex flex-col items-center justify-center p-4 pt-20">
+          <Loader2 className="w-10 h-10 text-td-coral animate-spin mb-4" />
+          <h2 className="text-xl font-bold text-white mb-2">Cargando tarifas en vivo...</h2>
+          <p className="text-xs text-td-muted">Consultando disponibilidad y precios reales con aerolíneas</p>
+        </main>
+        <Footer />
+      </div>
     );
   }
 
   if (!trip) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-[#070A12] text-td-primary">
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center p-4 pt-20">
           <h1 className="text-3xl font-bold mb-4">Escapada no encontrada</h1>
           <p className="text-td-muted mb-8 text-center max-w-md">
-            Parece que esta escapada ya no está disponible o el enlace es incorrecto.
+            Parece que esta escapada ya no está disponible o el enlace ha caducado.
           </p>
           <Link href="/resultados" className="td-btn-primary">
             Buscar nuevas escapadas
@@ -54,9 +115,9 @@ export default function TripDetailPage() {
     );
   }
 
-  const demoBudget = trip.totalPrice + 50; 
+  const demoBudget = trip.totalPrice + 50;
   const civitatisUrl = getCivitatisAffiliateUrl(trip.destination.city);
-  const finalDisplayTotal = trip.totalPrice + (carAdded ? carPrice : 0);
+  const finalDisplayTotal = trip.totalPrice + (carAdded ? carPrice : 0) + (insuranceAdded ? insurancePrice : 0);
 
   return (
     <div className="min-h-screen flex flex-col bg-td-deep text-td-primary">
@@ -71,31 +132,29 @@ export default function TripDetailPage() {
           <div className="flex items-center justify-between gap-4 mb-8">
             <Link href="/resultados" className="inline-flex items-center gap-2 text-sm text-td-muted hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              ← Ver más escapadas
+              <span>← Ver más escapadas</span>
             </Link>
 
             {trip.weather && (
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white shadow-sm">
                 <span>{trip.weather.icon}</span>
-                <span>{trip.weather.temp}°C en {trip.destination.city}</span>
-                <span className="text-td-muted font-normal hidden sm:inline">· {trip.weather.text}</span>
+                <span>{trip.weather.temp}°C</span>
+                <span className="text-td-muted hidden sm:inline">· {trip.weather.text}</span>
               </div>
             )}
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            
-            {/* Left Column - Main Content */}
-            <div className="w-full lg:w-2/3 flex flex-col gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left 2 Cols: Flights, Hotel, Car, Insurance, Itinerary, True Cost, Activities */}
+            <div className="lg:col-span-2 space-y-8">
               
-              {/* AI Recommendation Callout */}
-              <div className="td-glass p-4 rounded-2xl flex items-start gap-3 border border-td-violet/30 bg-td-violet/5">
-                <div className="bg-td-violet/20 p-2 rounded-xl shrink-0 text-base">
-                  💡
+              {/* AI Explanation / Deal Highlight Banner */}
+              <div className="p-5 rounded-3xl bg-gradient-to-r from-td-coral/10 via-td-amber/10 to-transparent border border-td-coral/20 flex items-start gap-3.5">
+                <span className="text-2xl shrink-0">✨</span>
+                <div>
+                  <h3 className="text-sm font-extrabold text-white mb-1">Por qué recomendamos este viaje</h3>
+                  <p className="text-xs text-td-secondary leading-relaxed">{trip.aiExplanation}</p>
                 </div>
-                <p className="text-xs sm:text-sm text-td-primary/90 leading-relaxed pt-0.5">
-                  <strong className="text-white font-bold">Por qué recomendamos esta escapada:</strong> {trip.aiExplanation}
-                </p>
               </div>
 
               {/* Flight Details */}
@@ -108,7 +167,7 @@ export default function TripDetailPage() {
               {/* Hotel Details */}
               <HotelCard 
                 hotel={trip.hotel} 
-                nights={trip.nights}
+                nights={trip.nights} 
                 checkIn={trip.outboundFlight.departure}
                 checkOut={trip.returnFlight.arrival}
                 destinationCity={trip.destination.city}
@@ -159,7 +218,7 @@ export default function TripDetailPage() {
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold flex items-center gap-2">
                       <Ticket className="w-5 h-5 text-td-amber" />
-                      🎟️ Qué hacer en {trip.destination.city}
+                      <span>🎟️ Qué hacer en {trip.destination.city}</span>
                     </h2>
                     <a
                       href={civitatisUrl}
@@ -168,45 +227,40 @@ export default function TripDetailPage() {
                       className="text-xs text-td-coral hover:text-td-orange flex items-center gap-1 font-bold"
                     >
                       <span>Ver todas en Civitatis</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {trip.activities.map((activity, idx) => (
-                      <div key={idx} className="bg-white/5 border border-white/5 rounded-xl p-4 flex flex-col">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold text-sm line-clamp-2 pr-2">{activity.name}</h3>
-                          <span className="font-bold text-td-amber">{activity.price} €</span>
+                    {trip.activities.map((act) => (
+                      <div key={act.name} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
+                        <img 
+                          src={act.image} 
+                          alt={act.name} 
+                          className="w-20 h-20 rounded-xl object-cover"
+                        />
+                        <div className="flex-1 flex flex-col justify-between">
+                          <div>
+                            <h3 className="font-bold text-sm text-white line-clamp-1">{act.name}</h3>
+                            <p className="text-[11px] text-td-muted mt-0.5">{act.duration}</p>
+                          </div>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-xs font-bold text-td-amber">⭐ {act.rating}</span>
+                            <span className="text-sm font-extrabold text-white">{act.price} €</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-td-muted mb-4">
-                          <span>⏱️ {activity.duration}</span>
-                          <span>⭐ {activity.rating}/10</span>
-                        </div>
-                        <a
-                          href={`https://www.civitatis.com/es/buscar?q=${encodeURIComponent(`${activity.name} ${trip.destination.city}`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-auto td-glass hover:bg-white/10 text-xs py-2 rounded-lg transition-colors w-full text-center font-semibold flex items-center justify-center gap-1.5"
-                        >
-                          <span>Ver en Civitatis</span>
-                          <ExternalLink className="w-3 h-3 text-td-muted" />
-                        </a>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
-              <ShareCard trip={trip} />
             </div>
 
-            {/* Right Column - Sticky Sidebar */}
-            <div className="w-full lg:w-1/3 lg:sticky lg:top-24 self-start">
+            {/* Right Col: Price Breakdown & Sticky Reservation CTA */}
+            <div className="space-y-6">
               <PriceBreakdown 
                 flightPrice={trip.flightPrice}
                 hotelPrice={trip.hotelPrice}
-                totalPrice={trip.totalPrice}
+                totalPrice={finalDisplayTotal}
                 budget={demoBudget}
                 activities={trip.activities}
                 destinationCity={trip.destination.city}
@@ -215,34 +269,15 @@ export default function TripDetailPage() {
                 departureDate={trip.outboundFlight.departure}
                 returnDate={trip.returnFlight.departure}
                 hotelName={trip.hotel.name}
-                carPrice={carPrice}
                 carAdded={carAdded}
-                insurancePrice={insurancePrice}
+                carPrice={carPrice}
                 insuranceAdded={insuranceAdded}
+                insurancePrice={insurancePrice}
               />
-            </div>
 
-          </div>
-        </div>
-
-        {/* Mobile Floating Sticky Bottom Booking Summary Bar */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0F1A]/95 backdrop-blur-2xl border-t border-white/15 p-4 shadow-2xl flex items-center justify-between">
-          <div>
-            <div className="text-[10px] text-td-muted uppercase font-bold">
-              Total {trip.hotel.isAirbnb ? 'Airbnb' : 'Hotel'} + Vuelo {carAdded ? '+ Coche' : ''} {insuranceAdded ? '+ Seguro' : ''}
-            </div>
-            <div className="text-xl font-black td-gradient-text leading-tight">
-              {trip.totalPrice + (carAdded ? carPrice : 0) + (insuranceAdded ? insurancePrice : 0)} € <span className="text-xs text-td-muted font-normal">/ pers.</span>
+              <ShareCard trip={trip} />
             </div>
           </div>
-          <a
-            href={civitatisUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="td-btn-primary py-2.5 px-6 text-xs font-black shadow-lg shadow-coral-950/40"
-          >
-            Reservar Viaje →
-          </a>
         </div>
       </main>
 

@@ -47,7 +47,14 @@ function ResultsContent() {
     let isMounted = true;
     setIsLoadingLive(true);
 
-    fetch(`/api/flights?origin=${paramOrigin}&resident=${paramResident}`)
+    const query = new URLSearchParams({
+      origin: paramOrigin,
+      resident: paramResident ? 'true' : 'false',
+      nights: paramNights.toString(),
+      month: paramMonth,
+    });
+
+    fetch(`/api/flights?${query.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
@@ -62,7 +69,7 @@ function ResultsContent() {
     return () => {
       isMounted = false;
     };
-  }, [paramOrigin, paramResident]);
+  }, [paramOrigin, paramResident, paramNights, paramMonth]);
 
   const handleToggleCompare = (trip: TripCombination) => {
     setCompareTrips((prev) => {
@@ -93,11 +100,7 @@ function ResultsContent() {
     return ALL_AIRPORTS.find((a) => a.code === paramOrigin) || ALL_AIRPORTS[0];
   }, [paramOrigin]);
 
-  const isOriginCanary = originAirport.region === 'canarias';
-  const isOriginBalearic = originAirport.region === 'baleares';
-  const isIslandOrigin = isOriginCanary || isOriginBalearic;
-
-  // Use live trips from Travelpayouts API if available, or fall back to curated base trips
+  // Use live trips from Travelpayouts API if available, or fall back to curated base trips (without arbitrary multipliers)
   const tripsWithPricing = useMemo(() => {
     if (liveTrips.length > 0) {
       return liveTrips;
@@ -106,27 +109,6 @@ function ResultsContent() {
     return MOCK_TRIPS
       .filter((trip) => trip.destination.city.toLowerCase() !== originAirport.city.toLowerCase())
       .map((trip) => {
-        const isDestinationIsland = ['Tenerife', 'Gran Canaria', 'Lanzarote', 'Fuerteventura', 'Mallorca', 'Ibiza'].includes(trip.destination.city);
-        const isDomestic = trip.destination.country === 'España';
-        
-        let flightPrice = trip.flightPrice;
-
-        if (isIslandOrigin) {
-          if (!paramResident && isDomestic) {
-            flightPrice = Math.round(trip.flightPrice * 3.2);
-          }
-        } else {
-          if (!isDomestic) {
-            flightPrice = Math.round(trip.flightPrice * 0.85);
-          } else if (isDestinationIsland && paramResident) {
-            flightPrice = Math.round(trip.flightPrice * 0.4);
-          } else {
-            flightPrice = Math.round(trip.flightPrice * 1.05);
-          }
-        }
-
-        const totalPrice = flightPrice + trip.hotelPrice;
-
         return {
           ...trip,
           outboundFlight: {
@@ -137,11 +119,9 @@ function ResultsContent() {
             ...trip.returnFlight,
             destination: originAirport,
           },
-          flightPrice,
-          totalPrice,
         } as TripCombination;
       });
-  }, [liveTrips, paramResident, originAirport, isIslandOrigin]);
+  }, [liveTrips, originAirport]);
 
   // Filter & Sort
   const filteredTrips = useMemo(() => {
@@ -198,6 +178,8 @@ function ResultsContent() {
     return trips;
   }, [tripsWithPricing, excludedCities, accommodation, directOnly, breakfastOnly, activeVibe, budget, sortBy]);
 
+  const usingMockData = liveTrips.length === 0 && !isLoadingLive;
+
   return (
     <>
       {/* Sticky Top Anchored Search Summary + Filter Control Center */}
@@ -208,6 +190,7 @@ function ResultsContent() {
           nights={paramNights}
           budget={budget}
           isResident={paramResident}
+          usingMockData={usingMockData}
         />
 
         <div className="h-px w-full bg-white/5" />
@@ -317,10 +300,14 @@ function ResultsContent() {
               <Compass className="w-8 h-8 text-td-coral" />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-              No encontramos escapadas con estos filtros
+              {accommodation === 'apartment' && liveTrips.length > 0
+                ? 'Filtro Airbnb solo disponible en escapadas de ejemplo'
+                : 'No encontramos escapadas con estos filtros'}
             </h2>
             <p className="text-td-secondary text-sm max-w-md mb-6 leading-relaxed">
-              Prueba a cambiar a &quot;Todos los alojamientos&quot;, subir el presupuesto o cambiar la temática.
+              {accommodation === 'apartment' && liveTrips.length > 0
+                ? 'Las tarifas en vivo de aerolíneas se combinan actualmente con hoteles recomendados. Cambia el filtro a "Todos" o "Hoteles" para ver todas las tarifas en vivo.'
+                : 'Prueba a cambiar a "Todos los alojamientos", subir el presupuesto o cambiar la temática.'}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <button
@@ -333,7 +320,7 @@ function ResultsContent() {
                 }}
                 className="td-btn-primary py-2.5 px-6 text-sm"
               >
-                Resetear filtros y probar con 200 €
+                Ver todos los alojamientos
               </button>
               <Link
                 href="/"

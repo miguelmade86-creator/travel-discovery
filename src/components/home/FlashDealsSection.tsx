@@ -9,14 +9,28 @@ import { TripCombination } from '@/lib/types';
 interface FlashDealsSectionProps {
   origin?: string;
   isResident?: boolean;
+  nights?: number;
+  month?: string;
 }
 
-export default function FlashDealsSection({ origin = 'TFS', isResident = true }: FlashDealsSectionProps) {
+export default function FlashDealsSection({
+  origin = 'TFS',
+  isResident = true,
+  nights = 3,
+  month = 'Octubre',
+}: FlashDealsSectionProps) {
   const [liveDeals, setLiveDeals] = useState<TripCombination[]>([]);
 
   useEffect(() => {
     let isMounted = true;
-    fetch(`/api/flights?origin=${origin}&resident=${isResident}`)
+    const query = new URLSearchParams({
+      origin: origin,
+      resident: isResident ? 'true' : 'false',
+      nights: nights.toString(),
+      month: month,
+    });
+
+    fetch(`/api/flights?${query.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
@@ -30,7 +44,7 @@ export default function FlashDealsSection({ origin = 'TFS', isResident = true }:
     return () => {
       isMounted = false;
     };
-  }, [origin, isResident]);
+  }, [origin, isResident, nights, month]);
 
   if (liveDeals.length === 0) {
     return null;
