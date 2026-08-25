@@ -1,26 +1,691 @@
 @import "tailwindcss";
 
+/* ========================================
+   TRAVELDISCOVERY — DESIGN SYSTEM
+   Premium Travel Discovery Engine
+   ======================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Palette */
+  --td-bg-deep: #0B0F1A;
+  --td-bg-card: #131828;
+  --td-bg-card-hover: #1A2038;
+  --td-bg-surface: #1E2540;
+  --td-text-primary: #F8FAFC;
+  --td-text-secondary: #94A3B8;
+  --td-text-muted: #64748B;
+
+  /* Accent Gradients */
+  --td-coral: #FF6B6B;
+  --td-orange: #FF8E53;
+  --td-amber: #FFBD44;
+  --td-violet: #A855F7;
+  --td-fuchsia: #D946EF;
+  --td-cyan: #22D3EE;
+  --td-emerald: #34D399;
+
+  /* Gradient Presets */
+  --td-gradient-primary: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FFBD44 100%);
+  --td-gradient-accent: linear-gradient(135deg, #A855F7 0%, #D946EF 50%, #FF6B6B 100%);
+  --td-gradient-hero: linear-gradient(180deg, #0B0F1A 0%, #131828 40%, #1A1040 100%);
+  --td-gradient-card: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  --td-gradient-surprise: linear-gradient(135deg, #D946EF 0%, #A855F7 40%, #6366F1 100%);
+
+  /* Glass Surfaces (Solid Dark with High Opacity to Prevent Bleed-Through) */
+  --td-glass-bg: rgba(19, 24, 40, 0.88);
+  --td-glass-border: rgba(255, 255, 255, 0.08);
+  --td-glass-bg-strong: rgba(11, 15, 26, 0.96);
+
+  /* Shadows */
+  --td-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --td-shadow-glow-coral: 0 0 40px rgba(255, 107, 107, 0.15);
+  --td-shadow-glow-violet: 0 0 40px rgba(168, 85, 247, 0.15);
+  --td-shadow-glow-amber: 0 0 40px rgba(255, 189, 68, 0.15);
+
+  /* Radii */
+  --td-radius-sm: 8px;
+  --td-radius-md: 12px;
+  --td-radius-lg: 16px;
+  --td-radius-xl: 24px;
+  --td-radius-2xl: 32px;
+  --td-radius-full: 9999px;
 }
 
+/* Tailwind v4 Theme Extension */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--td-bg-deep);
+  --color-foreground: var(--td-text-primary);
+  --color-td-deep: var(--td-bg-deep);
+  --color-td-card: var(--td-bg-card);
+  --color-td-card-hover: var(--td-bg-card-hover);
+  --color-td-surface: var(--td-bg-surface);
+  --color-td-primary: var(--td-text-primary);
+  --color-td-secondary: var(--td-text-secondary);
+  --color-td-muted: var(--td-text-muted);
+  --color-td-coral: var(--td-coral);
+  --color-td-orange: var(--td-orange);
+  --color-td-amber: var(--td-amber);
+  --color-td-violet: var(--td-violet);
+  --color-td-fuchsia: var(--td-fuchsia);
+  --color-td-cyan: var(--td-cyan);
+  --color-td-emerald: var(--td-emerald);
+  --font-sans: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ==============================
+   BASE STYLES
+   ============================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--td-bg-deep);
+  color: var(--td-text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* ==============================
+   UTILITY CLASSES & FIXES
+   ============================== */
+
+/* Missing scrollbar utilities */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Missing scale utility */
+@utility scale-108 {
+  transform: scale(1.08);
+}
+
+.scale-108 {
+  transform: scale(1.08);
+}
+
+/* ==============================
+   GLASS & CONTAINER UTILITIES
+   ============================== */
+
+.td-glass {
+  background: var(--td-glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--td-glass-border);
+}
+
+.td-glass-strong {
+  background: var(--td-glass-bg-strong);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.td-glass-card-hover {
+  position: relative;
+  background: var(--td-glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--td-glass-border);
+  border-radius: var(--td-radius-xl);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.td-glass-card-hover:hover {
+  background: var(--td-glass-bg-strong);
+  border-color: rgba(255, 107, 107, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), 0 0 28px rgba(255, 107, 107, 0.15);
+}
+
+/* ==============================
+   TYPOGRAPHY & GRADIENT TEXTS
+   ============================== */
+
+.td-gradient-text {
+  background: var(--td-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.td-gradient-text-accent {
+  background: var(--td-gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* BudgetTrips-inspired dramatic counter number with golden accent */
+.td-counter-number {
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, #FFE066 0%, #FFBD44 40%, #FF8E53 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 16px rgba(255, 189, 68, 0.35));
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ==============================
+   CARDS & DESTINATIONS
+   ============================== */
+
+.td-card {
+  background: var(--td-bg-card);
+  border: 1px solid var(--td-glass-border);
+  border-radius: var(--td-radius-xl);
+  box-shadow: var(--td-shadow-card);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.td-card:hover {
+  background: var(--td-bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: var(--td-shadow-card), var(--td-shadow-glow-coral);
+}
+
+/* BudgetTrips-inspired destination cards with zoom-on-hover & bottom gradient overlay */
+.td-card-destination {
+  position: relative;
+  border-radius: var(--td-radius-xl);
+  overflow: hidden;
+  background: var(--td-bg-card);
+  border: 1px solid var(--td-glass-border);
+  box-shadow: var(--td-shadow-card);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.td-card-destination:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255, 107, 107, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 107, 0.2);
+}
+
+.td-card-destination img,
+.td-card-destination .td-card-img,
+.td-card-destination [data-card-bg] {
+  transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
+  will-change: transform;
+}
+
+.td-card-destination:hover img,
+.td-card-destination:hover .td-card-img,
+.td-card-destination:hover [data-card-bg] {
+  transform: scale(1.08);
+  filter: brightness(0.9);
+}
+
+.td-card-destination .td-card-overlay,
+.td-card-destination-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 15, 26, 0.05) 0%,
+    rgba(11, 15, 26, 0.45) 50%,
+    rgba(11, 15, 26, 0.95) 100%
+  );
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* ==============================
+   BUTTONS & BADGES
+   ============================== */
+
+/* Primary Button with subtle white shimmer sweep effect on hover */
+.td-btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: var(--td-gradient-primary);
+  color: #0B0F1A;
+  font-weight: 700;
+  border-radius: var(--td-radius-full);
+  padding: 14px 32px;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.25);
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.td-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  transition: left 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.td-btn-primary:hover::before {
+  left: 140%;
+}
+
+.td-btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 32px rgba(255, 107, 107, 0.45);
+}
+
+.td-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.td-btn-surprise {
+  background: var(--td-gradient-surprise);
+  color: white;
+  font-weight: 700;
+  border-radius: var(--td-radius-full);
+  padding: 14px 32px;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.td-btn-surprise:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 32px rgba(168, 85, 247, 0.5);
+}
+
+.td-pill {
+  background: var(--td-glass-bg);
+  border: 1px solid var(--td-glass-border);
+  border-radius: var(--td-radius-full);
+  padding: 8px 18px;
+  font-size: 0.875rem;
+  color: var(--td-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.td-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--td-text-primary);
+}
+
+.td-pill-active {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: rgba(255, 107, 107, 0.4);
+  color: var(--td-coral);
+}
+
+/* Vibrant promotional offer badge with pulsing glow */
+.td-badge-offer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FFBD44 100%);
+  color: #0B0F1A;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: var(--td-radius-full);
+  box-shadow: 0 0 16px rgba(255, 107, 107, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: badge-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  user-select: none;
+}
+
+/* ==============================
+   ICON BOXES & LIVE INDICATORS
+   ============================== */
+
+/* Rounded icon containers with gradient backgrounds */
+.td-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--td-radius-lg);
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 142, 83, 0.1) 100%);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  color: var(--td-coral);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.12);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.td-icon-box:hover {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.25) 0%, rgba(255, 142, 83, 0.2) 100%);
+  border-color: rgba(255, 107, 107, 0.5);
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.25);
+}
+
+.td-icon-box-violet {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(217, 70, 239, 0.1) 100%);
+  border-color: rgba(168, 85, 247, 0.25);
+  color: var(--td-violet);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.12);
+}
+
+.td-icon-box-violet:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(217, 70, 239, 0.2) 100%);
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.25);
+}
+
+.td-icon-box-amber {
+  background: linear-gradient(135deg, rgba(255, 189, 68, 0.15) 0%, rgba(255, 142, 83, 0.1) 100%);
+  border-color: rgba(255, 189, 68, 0.25);
+  color: var(--td-amber);
+  box-shadow: 0 4px 16px rgba(255, 189, 68, 0.12);
+}
+
+.td-icon-box-amber:hover {
+  background: linear-gradient(135deg, rgba(255, 189, 68, 0.25) 0%, rgba(255, 142, 83, 0.2) 100%);
+  border-color: rgba(255, 189, 68, 0.5);
+  box-shadow: 0 8px 24px rgba(255, 189, 68, 0.25);
+}
+
+.td-icon-box-emerald {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15) 0%, rgba(34, 211, 238, 0.1) 100%);
+  border-color: rgba(52, 211, 153, 0.25);
+  color: var(--td-emerald);
+  box-shadow: 0 4px 16px rgba(52, 211, 153, 0.12);
+}
+
+.td-icon-box-emerald:hover {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.25) 0%, rgba(34, 211, 238, 0.2) 100%);
+  border-color: rgba(52, 211, 153, 0.5);
+  box-shadow: 0 8px 24px rgba(52, 211, 153, 0.25);
+}
+
+/* Pulsing green live indicator dot */
+.td-live-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--td-emerald);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.7);
+}
+
+.td-live-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--td-emerald);
+  opacity: 0.75;
+  animation: live-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ==============================
+   SECTION DIVIDERS & MARQUEE
+   ============================== */
+
+/* Decorative wave/curve SVG separator between sections */
+.td-section-divider {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.td-section-divider svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 48px;
+}
+
+@media (min-width: 768px) {
+  .td-section-divider svg {
+    height: 72px;
+  }
+}
+
+.td-section-divider-curve {
+  background: radial-gradient(ellipse 70% 100% at 50% 0%, rgba(255, 107, 107, 0.08) 0%, transparent 70%);
+  height: 60px;
+  width: 100%;
+}
+
+/* Scrolling ticker / marquee for live deals */
+.td-marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.td-marquee-content {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2rem;
+  animation: marquee 28s linear infinite;
+  min-width: 100%;
+}
+
+.td-marquee:hover .td-marquee-content {
+  animation-play-state: paused;
+}
+
+/* ==============================
+   ANIMATIONS & KEYFRAMES
+   ============================== */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(255, 107, 107, 0.4); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Animated number counter entrance */
+@keyframes count-up {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Offer badge pulsing glow */
+@keyframes badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(255, 107, 107, 0.4), 0 0 0 0 rgba(255, 107, 107, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(255, 107, 107, 0.65), 0 0 0 5px rgba(255, 107, 107, 0);
+  }
+}
+
+/* Live indicator ping animation */
+@keyframes live-ping {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  75%, 100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+/* Infinite marquee scrolling */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Score ring animation */
+@keyframes score-fill {
+  from { stroke-dashoffset: 251.2; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.animate-count-up {
+  animation: count-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==============================
+   BACKGROUND EFFECTS
+   ============================== */
+
+.td-hero-bg {
+  position: relative;
+  background: var(--td-gradient-hero);
+}
+
+.td-hero-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 40%, rgba(255, 107, 107, 0.06) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+              radial-gradient(circle at 50% 80%, rgba(255, 189, 68, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ==============================
+   BUDGET SLIDER CUSTOM STYLES
+   ============================== */
+
+input[type="range"].td-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+}
+
+input[type="range"].td-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--td-gradient-primary);
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255, 107, 107, 0.4);
+  border: 3px solid var(--td-bg-deep);
+  transition: transform 0.2s ease;
+}
+
+input[type="range"].td-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"].td-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--td-gradient-primary);
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255, 107, 107, 0.4);
+  border: 3px solid var(--td-bg-deep);
+}
+
+/* ==============================
+   RESPONSIVE HELPERS
+   ============================== */
+
+@media (max-width: 640px) {
+  .td-btn-primary,
+  .td-btn-surprise {
+    width: 100%;
+    justify-content: center;
+    padding: 16px 24px;
+    font-size: 1.05rem;
+  }
 }
