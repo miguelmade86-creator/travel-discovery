@@ -51,15 +51,22 @@ export default function SearchSummaryBar({
           </div>
 
           <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-2.5 py-1 text-td-secondary font-medium">
-            {isResident ? (
-              <>
-                <UserCheck className="w-3.5 h-3.5 text-td-cyan" />
-                <span className="text-emerald-400 font-bold">Residente (-75%)</span>
-              </>
+            {airport?.region === 'canarias' || airport?.region === 'baleares' ? (
+              isResident ? (
+                <>
+                  <UserCheck className="w-3.5 h-3.5 text-td-cyan" />
+                  <span className="text-emerald-400 font-bold">Residente (-75%)</span>
+                </>
+              ) : (
+                <>
+                  <UserX className="w-3.5 h-3.5 text-td-muted" />
+                  <span>No residente</span>
+                </>
+              )
             ) : (
               <>
-                <UserX className="w-3.5 h-3.5 text-td-muted" />
-                <span>Tarifa estándar</span>
+                <span className="text-xs">🇪🇸</span>
+                <span className="text-white font-medium">Tarifa Peninsular</span>
               </>
             )}
           </div>

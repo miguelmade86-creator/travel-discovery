@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { useUser, CustomCholloAlert } from '@/lib/user-context';
-import { CANARY_AIRPORTS, MONTHS } from '@/lib/types';
+import { ALL_AIRPORTS, MONTHS } from '@/lib/types';
 import TripCard from '@/components/results/TripCard';
 import { 
   User, 
@@ -209,9 +209,9 @@ export default function PerfilPage() {
                     onChange={(e) => setNewOrigin(e.target.value)}
                     className="w-full bg-white/[0.04] border border-white/10 focus:border-td-coral rounded-xl p-2.5 text-xs font-bold text-white outline-none"
                   >
-                    {CANARY_AIRPORTS.map((a) => (
+                    {ALL_AIRPORTS.map((a) => (
                       <option key={a.code} value={a.code} className="bg-[#0B0F1A] text-white">
-                        {a.name} ({a.code})
+                        {a.flag} {a.name} ({a.code})
                       </option>
                     ))}
                   </select>
@@ -253,7 +253,7 @@ export default function PerfilPage() {
                   <div className="flex gap-2">
                     <select
                       value={newChannel}
-                      onChange={(e) => setNewChannel(e.target.value as any)}
+                      onChange={(e) => setNewChannel(e.target.value as 'whatsapp' | 'telegram' | 'email')}
                       className="w-full bg-white/[0.04] border border-white/10 focus:border-td-coral rounded-xl p-2.5 text-xs font-bold text-white outline-none"
                     >
                       <option value="whatsapp" className="bg-[#0B0F1A] text-white">📲 WhatsApp</option>
@@ -407,9 +407,9 @@ export default function PerfilPage() {
                   onChange={(e) => updateProfile({ preferredOrigin: e.target.value })}
                   className="w-full bg-white/[0.04] border border-white/10 focus:border-td-coral rounded-xl p-3 text-xs font-bold text-white outline-none"
                 >
-                  {CANARY_AIRPORTS.map((a) => (
+                  {ALL_AIRPORTS.map((a) => (
                     <option key={a.code} value={a.code} className="bg-[#0B0F1A] text-white">
-                      {a.island} · {a.name} ({a.code})
+                      {a.flag} {a.name} ({a.code})
                     </option>
                   ))}
                 </select>

@@ -12,6 +12,7 @@ import { MOCK_TRIPS } from '@/lib/mock-data';
 import { SearchFilters, TripCombination, TRAVEL_VIBES, TravelVibe, AccommodationType, ALL_AIRPORTS } from '@/lib/types';
 import { Compass, RefreshCw, Sparkles, MessageCircle, X, RotateCcw, Scale, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { AFFILIATE_CONFIG } from '@/lib/affiliate';
 
 function ResultsContent() {
   const searchParams = useSearchParams();
@@ -257,12 +258,12 @@ function ResultsContent() {
               <MessageCircle className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm font-extrabold text-white">Canal de Chollos desde Canarias</h4>
-              <p className="text-xs text-td-muted">Recibe 1 escapada secreta al día por menos de 150 € en WhatsApp / Telegram.</p>
+              <h4 className="text-sm font-extrabold text-white">Canal VIP de Chollos de Viajes</h4>
+              <p className="text-xs text-td-muted">Recibe 1 escapada secreta al día por menos de 150 € directo en WhatsApp / Telegram.</p>
             </div>
           </div>
           <a
-            href="https://whatsapp.com"
+            href={AFFILIATE_CONFIG.whatsappChannelUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-[#0B0F1A] text-xs font-black transition-colors shrink-0 flex items-center gap-1.5 shadow-lg"
