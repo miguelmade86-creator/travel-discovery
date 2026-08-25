@@ -250,7 +250,7 @@ export async function getLiveFlightTrips(
             morning: `Últimas compras de recuerdos y paseo matutino por el centro.`,
             afternoon: `Comida típica de despedida en una terraza agradable.`,
             evening: `Traslado al aeropuerto y vuelo de regreso a ${cleanOrigin}.`,
-            tip: `Disfruta de tus recuerdos y comparte tu experiencia con la comunidad de TravelDiscovery.`,
+            tip: `Disfruta de tus recuerdos y comparte tu experiencia con la comunidad de escapya.`,
           },
         ],
       });

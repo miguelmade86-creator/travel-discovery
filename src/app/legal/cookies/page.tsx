@@ -71,7 +71,7 @@ export default function CookiesPage() {
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-td-amber/20 text-td-amber">Transparencia</span>
                 </div>
                 <p className="text-xs text-td-muted">
-                  Cuando haces clic en &quot;Ver Hotel en Booking&quot; o &quot;Ver Vuelo&quot;, se añade un identificador seguro de referencia para que el proveedor sepa que vienes de TravelDiscovery. Esto nos permite mantener la web 100% gratuita y sin anuncios molestos.
+                  Cuando haces clic en &quot;Ver Hotel en Booking&quot; o &quot;Ver Vuelo&quot;, se añade un identificador seguro de referencia para que el proveedor sepa que vienes de escapya. Esto nos permite mantener la web 100% gratuita y sin anuncios molestos.
                 </p>
               </div>
 

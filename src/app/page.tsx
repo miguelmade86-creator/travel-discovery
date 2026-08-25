@@ -105,7 +105,7 @@ export default function Home() {
                 Algoritmo Inteligente
               </div>
               <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
-                La magia de <span className="td-gradient-text">TravelDiscovery</span>
+                La magia de <span className="td-gradient-text">escapya</span>
               </h2>
               <p className="text-td-secondary max-w-xl mx-auto text-sm sm:text-base">
                 Cruza millones de tarifas aéreas y disponibilidades de hotel para entregarte viajes 100% coherentes.

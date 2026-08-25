@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Compass, Menu, X, Heart, Bell, Search, User } from 'lucide-react';
 import { useUser } from '@/lib/user-context';
 
+import EscapyaLogo from '@/components/brand/EscapyaLogo';
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { favorites, openFavoritesDrawer, openAlertModal, user, openAuthModal } = useUser();
@@ -65,19 +67,8 @@ export default function Header() {
           <div className="flex items-center justify-between h-16 sm:h-[72px]">
             
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg"
-                   style={{ background: 'var(--td-gradient-primary)' }}>
-                <Compass className="w-5 h-5 text-[#0B0F1A]" strokeWidth={2.5} />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base font-bold tracking-tight text-white leading-tight">
-                  Travel<span className="td-gradient-text">Discovery</span>
-                </span>
-                <span className="text-[10px] text-td-muted font-medium tracking-wider uppercase hidden sm:block">
-                  Motor de escapadas
-                </span>
-              </div>
+            <Link href="/" className="flex items-center group">
+              <EscapyaLogo size="md" />
             </Link>
 
             {/* Desktop Nav */}

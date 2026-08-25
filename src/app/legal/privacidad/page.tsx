@@ -47,7 +47,7 @@ export default function PrivacidadPage() {
               <span className="text-emerald-400">1.</span> Responsable del Tratamiento de tus Datos
             </h2>
             <p>
-              El responsable del tratamiento de los datos personales recabados a través de <strong>TravelDiscovery</strong> es el equipo gestor de la plataforma. Para cualquier ejercicio de derechos o aclaración sobre privacidad, puedes contactar con nuestro Delegado de Protección de Datos en: <strong className="text-white">privacidad@traveldiscovery.app</strong>.
+              El responsable del tratamiento de los datos personales recabados a través de <strong>escapya</strong> es el equipo gestor de la plataforma. Para cualquier ejercicio de derechos o aclaración sobre privacidad, puedes contactar con nuestro Delegado de Protección de Datos en: <strong className="text-white">privacidad@escapya.com</strong>.
             </p>
           </section>
 
@@ -56,7 +56,7 @@ export default function PrivacidadPage() {
               <span className="text-emerald-400">2.</span> Datos que Recopilamos y Finalidad
             </h2>
             <p>
-              TravelDiscovery aplica el principio de <strong>minimización de datos</strong>. Solo recopilamos los datos estrictamente necesarios para proporcionarte la mejor experiencia de descubrimiento de viajes:
+              escapya aplica el principio de <strong>minimización de datos</strong>. Solo recopilamos los datos estrictamente necesarios para proporcionarte la mejor experiencia de descubrimiento de viajes:
             </p>
             <div className="grid sm:grid-cols-2 gap-4 mt-4 text-xs">
               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
@@ -88,7 +88,7 @@ export default function PrivacidadPage() {
               <span className="text-emerald-400">4.</span> No Venta de Datos a Terceros
             </h2>
             <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs mb-3">
-              🛡️ <strong>COMPROMISO DE PRIVACIDAD:</strong> TravelDiscovery <strong>NUNCA venderá, alquilará ni cederá tus datos personales o historial de búsqueda a anunciantes, bancos de datos ni agencias externas</strong>.
+              🛡️ <strong>COMPROMISO DE PRIVACIDAD:</strong> escapya <strong>NUNCA venderá, alquilará ni cederá tus datos personales o historial de búsqueda a anunciantes, bancos de datos ni agencias externas</strong>.
             </div>
             <p>
               Tus datos solo son tratados por proveedores tecnológicos esenciales (como servidores de base de datos encriptados y plataformas seguras de envío de notificaciones como Resend o Twilio).
@@ -105,7 +105,7 @@ export default function PrivacidadPage() {
             <ul className="list-disc list-inside mt-2 space-y-1 text-xs">
               <li><strong>Acceder</strong> a los datos que tenemos sobre ti.</li>
               <li><strong>Rectificar</strong> cualquier dato erróneo o desactualizado.</li>
-              <li><strong>Suprimir tus datos (&quot;Derecho al olvido&quot;):</strong> Puedes eliminar tu cuenta o darte de baja de cualquier alerta con 1 solo clic en el pie de cualquier notificación o escribiéndonos a privacidad@traveldiscovery.app.</li>
+              <li><strong>Suprimir tus datos (&quot;Derecho al olvido&quot;):</strong> Puedes eliminar tu cuenta o darte de baja de cualquier alerta con 1 solo clic en el pie de cualquier notificación o escribiéndonos a privacidad@escapya.com.</li>
               <li><strong>Oponerte</strong> o limitar el tratamiento en cualquier momento.</li>
             </ul>
           </section>

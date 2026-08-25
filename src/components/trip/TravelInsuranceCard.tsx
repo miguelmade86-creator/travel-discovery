@@ -92,7 +92,7 @@ export default function TravelInsuranceCard({
       {/* Action Row */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-white/5">
         <div className="text-xs text-td-secondary text-center sm:text-left">
-          IATI Seguros Oficial con <strong className="text-cyan-300 font-black">5% dto. TravelDiscovery</strong>
+          IATI Seguros Oficial con <strong className="text-cyan-300 font-black">5% dto. escapya</strong>
         </div>
 
         <div className="flex items-center gap-2.5 w-full sm:w-auto">

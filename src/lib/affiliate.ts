@@ -1,5 +1,5 @@
 // =========================================================================
-// TRAVELDISCOVERY — CENTRALIZED AFFILIATE ENGINE (OPTION A)
+// ESCAPYA — CENTRALIZED AFFILIATE ENGINE
 // Supports Travelpayouts (Kiwi/Aviasales/Booking/DiscoverCars/IATI), Civitatis, and Direct Booking
 // =========================================================================
 
@@ -14,8 +14,8 @@ export const AFFILIATE_CONFIG = {
   bookingAid: process.env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID || '2418902',
 
   // VIP Community Channels (WhatsApp & Telegram)
-  whatsappChannelUrl: process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || 'https://whatsapp.com/channel/0029VaTravelDiscovery',
-  telegramChannelUrl: process.env.NEXT_PUBLIC_TELEGRAM_CHANNEL_URL || 'https://t.me/traveldiscovery_chollos',
+  whatsappChannelUrl: process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || 'https://whatsapp.com/channel/0029VaEscapya',
+  telegramChannelUrl: process.env.NEXT_PUBLIC_TELEGRAM_CHANNEL_URL || 'https://t.me/escapya_chollos',
 };
 
 /**
@@ -151,7 +151,7 @@ export function getCivitatisAffiliateUrl(
   const params = new URLSearchParams({
     q: query,
     aid: AFFILIATE_CONFIG.civitatisAffiliateId,
-    cmp: 'traveldiscovery_app',
+    cmp: 'escapya_app',
   });
 
   return `${baseUrl}?${params.toString()}`;
@@ -169,7 +169,7 @@ export function getCarRentalAffiliateUrl(
   const params = new URLSearchParams({
     a_aid: AFFILIATE_CONFIG.travelpayoutsMarker,
     city: cityName,
-    label: `td_car_${encodeURIComponent(cityName.toLowerCase())}`,
+    label: `escapya_car_${encodeURIComponent(cityName.toLowerCase())}`,
   });
 
   if (pickupDate) {
@@ -194,7 +194,7 @@ export function getTravelInsuranceAffiliateUrl(
     r: AFFILIATE_CONFIG.travelpayoutsMarker,
     destino: destinationCountry,
     dias: tripDays.toString(),
-    distribuidor: 'traveldiscovery',
+    distribuidor: 'escapya',
   });
 
   return `${baseUrl}?${params.toString()}`;

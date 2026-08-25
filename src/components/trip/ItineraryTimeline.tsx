@@ -26,7 +26,7 @@ export default function ItineraryTimeline({
   const shareToWhatsApp = () => {
     const text = `🗺️ ¡Mira este planazo de escapada a ${cityName} por solo ${totalPrice} € (Vuelo + Hotel)!%0A%0A📍 *Plan de viaje:*%0A${itinerary
       .map((d) => `*Día ${d.day}:* ${d.title}%0A- Mañana: ${d.morning}%0A- Tarde: ${d.afternoon}%0A- Noche: ${d.evening}`)
-      .join('%0A%0A')}%0A%0AEncontrado en TravelDiscovery.`;
+      .join('%0A%0A')}%0A%0AEncontrado en escapya.`;
     window.open(`https://wa.me/?text=${text}`, '_blank');
   };
 

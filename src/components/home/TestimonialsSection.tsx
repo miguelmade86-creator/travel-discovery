@@ -13,7 +13,7 @@ export default function TestimonialsSection() {
             💬 Historias Reales
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
-            Viajeros que ya se han escapado con <span className="td-gradient-text">TravelDiscovery</span>
+            Viajeros que ya se han escapado con <span className="td-gradient-text">escapya</span>
           </h2>
           <p className="text-td-secondary max-w-2xl mx-auto text-sm sm:text-base">
             Gente de Canarias que decidió poner un presupuesto cerrado y dejarse sorprender.

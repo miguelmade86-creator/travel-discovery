@@ -42,10 +42,10 @@ export default function AfiliadosPage() {
           
           <section className="bg-white/[0.02] border border-white/5 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-              <span className="text-td-cyan">1.</span> ¿Cómo se financia TravelDiscovery? (100% Gratis para ti)
+              <span className="text-td-cyan">1.</span> ¿Cómo se financia escapya? (100% Gratis para ti)
             </h2>
             <p>
-              Creemos en la máxima transparencia: <strong>TravelDiscovery es un servicio 100% gratuito para el usuario</strong>. No cobramos comisiones de gestión, no aplicamos cargos ocultos ni inflamos los precios de los billetes de avión ni de los hoteles.
+              Creemos en la máxima transparencia: <strong>escapya es un servicio 100% gratuito para el usuario</strong>. No cobramos comisiones de gestión, no aplicamos cargos ocultos ni inflamos los precios de los billetes de avión ni de los hoteles.
             </p>
             <p className="mt-3">
               Cuando encuentras una escapada que te apasiona y decides reservar a través de nuestros enlaces directos a las páginas oficiales de los proveedores (como <strong>Booking.com, aerolíneas o Civitatis</strong>), nosotros podemos recibir una pequeña comisión de afiliado por parte de dicha empresa sin que a ti te cueste ni un solo céntimo extra.
@@ -57,7 +57,7 @@ export default function AfiliadosPage() {
               <span className="text-td-cyan">2.</span> Garantía de Independencia del Algoritmo TripScore
             </h2>
             <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs mb-3">
-              ⭐ <strong>COMPROMISO DE OBJETIVIDAD:</strong> Ninguna aerolínea ni ningún hotel puede pagar dinero a TravelDiscovery para alterar su TripScore ni para aparecer más arriba en los resultados.
+              ⭐ <strong>COMPROMISO DE OBJETIVIDAD:</strong> Ninguna aerolínea ni ningún hotel puede pagar dinero a escapya para alterar su TripScore ni para aparecer más arriba en los resultados.
             </div>
             <p>
               El algoritmo de <strong>TripScore (0 a 100)</strong> es 100% matemático y objetivo. Evalúa exclusivamente:
@@ -74,7 +74,7 @@ export default function AfiliadosPage() {
               <span className="text-td-cyan">3.</span> Relación con Terceros Proveedores
             </h2>
             <p>
-              TravelDiscovery mantiene relaciones de afiliación técnica con redes globales de viajes autorizadas, incluyendo Travelpayouts, Booking.com Partner Program, Awin y Civitatis. Todas las marcas registradas y logotipos mostrados pertenecen a sus respectivos propietarios y se utilizan únicamente a efectos informativos y de identificación del servicio para el viajero.
+              escapya mantiene relaciones de afiliación técnica con redes globales de viajes autorizadas, incluyendo Travelpayouts, Booking.com Partner Program, Awin y Civitatis. Todas las marcas registradas y logotipos mostrados pertenecen a sus respectivos propietarios y se utilizan únicamente a efectos informativos y de identificación del servicio para el viajero.
             </p>
           </section>
 

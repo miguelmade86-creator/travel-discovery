@@ -10,21 +10,23 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "TravelDiscovery — Tú pones el presupuesto, nosotros la escapada",
+  title: "escapya — Tú pones el presupuesto, nosotros la escapada",
   description:
-    "Descubre los mejores viajes dentro de tu presupuesto. Vuelo + Hotel combinados desde Canarias. Motor de descubrimiento de escapadas inteligente.",
+    "Descubre las mejores escapadas dentro de tu presupuesto. Vuelo + Hotel combinados en tiempo real. Motor inteligente de escapadas.",
   keywords: [
+    "escapya",
     "viajes baratos",
     "escapadas desde Canarias",
     "vuelos baratos Tenerife",
     "viajes presupuesto",
-    "descubrimiento de viajes",
+    "escapadas de fin de semana",
   ],
   openGraph: {
-    title: "TravelDiscovery — Tú pones el presupuesto, nosotros la escapada",
+    title: "escapya — Tú pones el presupuesto, nosotros la escapada",
     description:
-      "¿Cuánto tienes para viajar? Descubre escapadas completas (vuelo + hotel) dentro de tu presupuesto.",
+      "¿Cuánto tienes para viajar? Descubre escapadas completas (vuelo + hotel) dentro de tu presupuesto con escapya.",
     type: "website",
+    siteName: "escapya",
   },
 };
 

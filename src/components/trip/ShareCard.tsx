@@ -13,7 +13,7 @@ export default function ShareCard({ trip }: ShareCardProps) {
   const [copied, setCopied] = useState(false);
   const { showToast } = useUser();
 
-  const shareText = `✈️ ¡Mira qué viajazo he encontrado con TravelDiscovery! Escapada a ${trip.destination.city} (${trip.nights} noches, Vuelo + Hotel) por solo ${trip.totalPrice} €:`;
+  const shareText = `✈️ ¡Mira qué viajazo he encontrado con escapya! Escapada a ${trip.destination.city} (${trip.nights} noches, Vuelo + Hotel) por solo ${trip.totalPrice} €:`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(`${shareText} ${window.location.href}`).catch(() => {});
@@ -83,8 +83,8 @@ export default function ShareCard({ trip }: ShareCardProps) {
 
             <div className="text-[11px] font-semibold text-td-muted flex items-center justify-center gap-1.5">
               <span>Descubierto en</span>
-              <span className="text-white font-bold">Travel</span>
-              <span className="td-gradient-text font-black">Discovery</span>
+              <span className="text-white font-bold">escap</span>
+              <span className="td-gradient-text font-black">ya</span>
             </div>
           </div>
         </div>

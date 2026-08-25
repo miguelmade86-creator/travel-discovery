@@ -202,7 +202,7 @@ export default function TripCompareModal({
           <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-td-violet/10 via-td-coral/10 to-transparent border border-white/10 flex items-center gap-3">
             <Zap className="w-5 h-5 text-td-amber shrink-0" />
             <div className="text-xs text-td-secondary">
-              <strong className="text-white">Veredicto TravelDiscovery:</strong> Si buscas gastar lo mínimo con el mejor clima,{' '}
+              <strong className="text-white">Veredicto escapya:</strong> Si buscas gastar lo mínimo con el mejor clima,{' '}
               <strong className="text-td-coral">{winner.destination.city}</strong> lidera por precio y confort (TripScore: {winner.tripScore}/100).
             </div>
           </div>
