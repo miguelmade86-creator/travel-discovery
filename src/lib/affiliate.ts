@@ -87,10 +87,45 @@ export function getFlightBookingAffiliateUrl(
 ): string {
   const origin = (originCode || 'TFS').toUpperCase().trim();
   const dest = (destCode || 'BCN').toUpperCase().trim();
+
+  const formatDateDayMonth = (isoDate: string) => {
+    try {
+      const d = new Date(isoDate);
+      if (isNaN(d.getTime())) return '';
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      return `${day}${month}`;
+    } catch {
+      return '';
+    }
+  };
+
+  const depStr = departureDate ? formatDateDayMonth(departureDate) : '';
+  const retStr = returnDate ? formatDateDayMonth(returnDate) : '';
+
+  // Official Aviasales search URL (Native Travelpayouts flight engine - Real low-cost prices with no agency markups)
+  if (depStr && retStr) {
+    return `https://www.aviasales.es/search/${origin}${depStr}${dest}${retStr}1?marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
+  }
+
+  // Fallback if no specific dates
+  return `https://www.aviasales.es/search/${origin}${dest}1?marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
+}
+
+/**
+ * Builds a Kiwi deep link as an alternative
+ */
+export function getKiwiAffiliateUrl(
+  originCode: string,
+  destCode: string,
+  departureDate?: string,
+  returnDate?: string
+): string {
+  const origin = (originCode || 'TFS').toUpperCase().trim();
+  const dest = (destCode || 'BCN').toUpperCase().trim();
   const dep = departureDate ? departureDate.split('T')[0] : '';
   const ret = returnDate ? returnDate.split('T')[0] : '';
 
-  // Kiwi official deep link handler (pre-fills origin, destination, dates, and tracks affiliate marker)
   const kiwiUrl = new URL('https://www.kiwi.com/deep');
   kiwiUrl.searchParams.set('from', origin);
   kiwiUrl.searchParams.set('to', dest);
@@ -101,35 +136,6 @@ export function getFlightBookingAffiliateUrl(
   kiwiUrl.searchParams.set('currency', 'EUR');
 
   return kiwiUrl.toString();
-}
-
-/**
- * Builds an Aviasales direct flight search link with Travelpayouts marker
- */
-export function getAviasalesAffiliateUrl(
-  originCode: string,
-  destCode: string,
-  departureDate?: string,
-  returnDate?: string
-): string {
-  const origin = (originCode || 'TFS').toUpperCase().trim();
-  const dest = (destCode || 'BCN').toUpperCase().trim();
-  
-  const formatDateDayMonth = (isoDate: string) => {
-    const d = new Date(isoDate);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    return `${day}${month}`;
-  };
-
-  const depStr = departureDate ? formatDateDayMonth(departureDate) : '';
-  const retStr = returnDate ? formatDateDayMonth(returnDate) : '';
-
-  if (depStr && retStr) {
-    return `https://www.aviasales.es/search/${origin}${depStr}${dest}${retStr}1?marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
-  }
-
-  return `https://www.aviasales.es/search/${origin}${dest}1?marker=${AFFILIATE_CONFIG.travelpayoutsMarker}`;
 }
 
 /**

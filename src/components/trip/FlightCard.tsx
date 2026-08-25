@@ -120,9 +120,9 @@ export default function FlightCard({ outbound, returnFlight, price }: FlightCard
           href={flightUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="td-glass hover:bg-white/10 transition-colors rounded-full px-6 py-2.5 text-sm font-medium flex items-center gap-2"
+          className="td-btn-primary rounded-full px-6 py-2.5 text-xs font-bold flex items-center gap-2 shadow-lg"
         >
-          <span>Ver vuelo en {outbound.airline}</span>
+          <span>Buscar vuelos oficiales ({price} €)</span>
           <ExternalLink className="w-4 h-4" />
         </a>
       </div>
