@@ -521,13 +521,12 @@ function resolveDestinationMeta(iata: string) {
 
 /**
  * Fetches live cheap flight combinations directly from Travelpayouts / Aviasales Data API
- * Uses 100% RAW REAL prices without any artificial discounts
+ * Always queries strictly by origin for 100% cacheability (30 mins) and maximum route coverage.
  */
 export async function getLiveFlightTrips(
   originCode: string = 'TFS',
   isResident: boolean = true,
-  nights: number = 3,
-  departMonth?: string
+  nights: number = 3
 ): Promise<TripCombination[]> {
   try {
     const cleanOrigin = (originCode || 'TFS').toUpperCase().trim();
@@ -538,19 +537,15 @@ export async function getLiveFlightTrips(
       return [];
     }
 
-    let url = `https://api.travelpayouts.com/v1/prices/cheap?origin=${cleanOrigin}&currency=EUR&token=${API_TOKEN}`;
-    
-    // Include depart_date (YYYY-MM) if valid
-    if (departMonth && /^\d{4}-\d{2}$/.test(departMonth)) {
-      url += `&depart_date=${departMonth}`;
-    }
+    // Pure origin-based query: Shared cache, maximum coverage, never empty due to narrow date filters
+    const url = `https://api.travelpayouts.com/v1/prices/cheap?origin=${cleanOrigin}&currency=EUR&token=${API_TOKEN}`;
 
     const res = await fetch(url, {
       next: { revalidate: 1800 }, // Cache 30 mins
       headers: { 'Accept': 'application/json' },
     });
 
-    console.log(`[Travelpayouts API] Fetching origin=${cleanOrigin}, nights=${nightsCount}, month=${departMonth || 'any'}, status=${res.status}`);
+    console.log(`[Travelpayouts API] Fetching origin=${cleanOrigin}, status=${res.status}`);
 
     if (!res.ok) {
       console.warn(`[Travelpayouts API] Returned HTTP ${res.status}: ${res.statusText}`);
