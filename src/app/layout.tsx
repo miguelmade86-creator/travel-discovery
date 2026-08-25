@@ -44,13 +44,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
         
-        {/* Official Travelpayouts Drive Tracking Script */}
-        <Script
-          id="travelpayouts-drive"
-          strategy="afterInteractive"
-          src="https://tp-em.com/NTY2NjI4.js?t=566628"
-          data-cmp-ab="2"
-        />
+        {/* Official Travelpayouts Drive Tracking Script (Runs in production) */}
+        {process.env.NODE_ENV === 'production' && (
+          <Script
+            id="travelpayouts-drive"
+            strategy="afterInteractive"
+            src="https://tp-em.com/NTY2NjI4.js?t=566628"
+            data-cmp-ab="2"
+          />
+        )}
       </body>
     </html>
   );

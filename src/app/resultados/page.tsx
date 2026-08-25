@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, Suspense } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -35,10 +35,34 @@ function ResultsContent() {
   const [activeVibe, setActiveVibe] = useState<TravelVibe>(paramVibe);
   const [accommodation, setAccommodation] = useState<AccommodationType>(paramAccommodation);
   const [excludedCities, setExcludedCities] = useState<string[]>([]);
+  const [liveFlightRates, setLiveFlightRates] = useState<Record<string, number>>({});
   
   // Side-by-Side Comparison State
   const [compareTrips, setCompareTrips] = useState<TripCombination[]>([]);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
+  // Query live Travelpayouts Flight Data API for the selected origin
+  useEffect(() => {
+    let isMounted = true;
+    fetch(`/api/flights?origin=${paramOrigin}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const rates: Record<string, number> = {};
+          data.data.forEach((flight: any) => {
+            if (flight.destination && flight.price) {
+              rates[flight.destination.toUpperCase()] = flight.price;
+            }
+          });
+          setLiveFlightRates(rates);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, [paramOrigin]);
 
   const handleToggleCompare = (trip: TripCombination) => {
     setCompareTrips((prev) => {
@@ -80,10 +104,15 @@ function ResultsContent() {
       .map((trip) => {
         const isDestinationIsland = ['Tenerife', 'Gran Canaria', 'Lanzarote', 'Fuerteventura', 'Mallorca', 'Ibiza'].includes(trip.destination.city);
         const isDomestic = trip.destination.country === 'España';
+        const destCode = trip.outboundFlight.destination.code;
+        const livePrice = liveFlightRates[destCode];
         
         let flightPrice = trip.flightPrice;
-        
-        if (isIslandOrigin) {
+
+        if (livePrice && livePrice > 15) {
+          // If live Travelpayouts price is fetched
+          flightPrice = isIslandOrigin && paramResident && isDomestic ? Math.round(livePrice * 0.45) : livePrice;
+        } else if (isIslandOrigin) {
           // From islands to peninsula: resident subsidy 75%
           if (!paramResident && isDomestic) {
             flightPrice = Math.round(trip.flightPrice * 3.2);
@@ -92,7 +121,7 @@ function ResultsContent() {
           // From Peninsula (MAD, BCN, SVQ, AGP, VLC, BIO, etc.):
           // To Europe: super competitive standard low cost fares (Ryanair/Vueling/EasyJet)
           if (!isDomestic) {
-            flightPrice = Math.round(trip.flightPrice * 0.85); // Direct Europe flights from Madrid/BCN are even cheaper!
+            flightPrice = Math.round(trip.flightPrice * 0.85);
           } else if (isDestinationIsland && paramResident) {
             flightPrice = Math.round(trip.flightPrice * 0.4);
           } else {
@@ -116,7 +145,7 @@ function ResultsContent() {
           totalPrice,
         } as TripCombination;
       });
-  }, [paramResident, originAirport, isIslandOrigin]);
+  }, [paramResident, originAirport, isIslandOrigin, liveFlightRates]);
 
   // Filter & Sort
   const filteredTrips = useMemo(() => {
