@@ -1,23 +1,27 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { MOCK_TRIPS } from '@/lib/mock-data';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FlightCard from '@/components/trip/FlightCard';
 import HotelCard from '@/components/trip/HotelCard';
+import CarRentalCard from '@/components/trip/CarRentalCard';
 import PriceBreakdown from '@/components/trip/PriceBreakdown';
 import TripHeader from '@/components/trip/TripHeader';
 import ShareCard from '@/components/trip/ShareCard';
 import DestinationCostCard from '@/components/trip/DestinationCostCard';
 import ItineraryTimeline from '@/components/trip/ItineraryTimeline';
 import Link from 'next/link';
-import { ArrowLeft, Ticket, ExternalLink, Sun, Thermometer } from 'lucide-react';
+import { ArrowLeft, Ticket, ExternalLink } from 'lucide-react';
 import { getCivitatisAffiliateUrl } from '@/lib/affiliate';
 
 export default function TripDetailPage() {
   const params = useParams();
   const id = params.id as string;
+  const [carAdded, setCarAdded] = useState(false);
+  const [carPrice, setCarPrice] = useState(0);
 
   const trip = MOCK_TRIPS.find((t) => t.id === id);
 
@@ -41,6 +45,7 @@ export default function TripDetailPage() {
 
   const demoBudget = trip.totalPrice + 50; 
   const civitatisUrl = getCivitatisAffiliateUrl(trip.destination.city);
+  const finalDisplayTotal = trip.totalPrice + (carAdded ? carPrice : 0);
 
   return (
     <div className="min-h-screen flex flex-col bg-td-deep text-td-primary">
@@ -96,6 +101,19 @@ export default function TripDetailPage() {
                 checkIn={trip.outboundFlight.departure}
                 checkOut={trip.returnFlight.arrival}
                 destinationCity={trip.destination.city}
+              />
+
+              {/* Optional Car Rental Add-on Card (Travelpayouts DiscoverCars) */}
+              <CarRentalCard
+                rental={trip.carRental}
+                city={trip.destination.city}
+                nights={trip.nights}
+                pickupDate={trip.outboundFlight.departure}
+                returnDate={trip.returnFlight.arrival}
+                onToggleAddCar={(added, price) => {
+                  setCarAdded(added);
+                  setCarPrice(added ? price : 0);
+                }}
               />
 
               {/* Destination Living Cost Calculator (Real True Cost) */}
@@ -172,6 +190,8 @@ export default function TripDetailPage() {
                 destinationCity={trip.destination.city}
                 originCode={trip.outboundFlight.origin.code}
                 hotelName={trip.hotel.name}
+                carPrice={carPrice}
+                carAdded={carAdded}
               />
             </div>
 
@@ -182,21 +202,19 @@ export default function TripDetailPage() {
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0F1A]/95 backdrop-blur-2xl border-t border-white/15 p-4 shadow-2xl flex items-center justify-between">
           <div>
             <div className="text-[10px] text-td-muted uppercase font-bold">
-              Total Vuelo + {trip.hotel.isAirbnb ? 'Airbnb' : 'Hotel'}
+              Total {trip.hotel.isAirbnb ? 'Airbnb' : 'Hotel'} + Vuelo {carAdded ? '+ Coche' : ''}
             </div>
             <div className="text-xl font-black td-gradient-text leading-tight">
-              {trip.totalPrice} € <span className="text-xs text-td-muted font-normal">/ pers.</span>
+              {finalDisplayTotal} € <span className="text-xs text-td-muted font-normal">/ pers.</span>
             </div>
           </div>
           <a
-            href={`https://www.google.com/travel/flights?q=Flights%20to%20${encodeURIComponent(
-              trip.destination.city
-            )}%20from%20${trip.outboundFlight.origin.code}`}
+            href={civitatisUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="td-btn-primary py-2.5 px-6 text-xs font-black shadow-lg shadow-coral-950/40"
           >
-            Reservar Ahora →
+            Reservar Viaje →
           </a>
         </div>
       </main>

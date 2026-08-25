@@ -85,6 +85,20 @@ export type TravelVibe = 'all' | 'gastronomy' | 'culture' | 'sun' | 'nightlife' 
 
 export type PriceTrend = 'lowest' | 'stable' | 'rising';
 
+export interface CarRentalInfo {
+  available: boolean;
+  company: string;
+  carModel: string;
+  carType: string;
+  dailyRate: number;
+  totalPrice: number;
+  image: string;
+  fuelPolicy: string;
+  unlimitedMileage: boolean;
+  freeCancellation: boolean;
+  pickupLocation: string;
+}
+
 export interface TripCombination {
   id: string;
   destination: {
@@ -98,6 +112,7 @@ export interface TripCombination {
   outboundFlight: FlightLeg;
   returnFlight: FlightLeg;
   hotel: HotelInfo;
+  carRental?: CarRentalInfo;
   flightPrice: number;
   hotelPrice: number;
   totalPrice: number;

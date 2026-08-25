@@ -112,3 +112,28 @@ export function getCivitatisAffiliateUrl(
 
   return `${baseUrl}?${params.toString()}`;
 }
+
+/**
+ * Builds a Car Rental affiliate deeplink with Travelpayouts / DiscoverCars tracking
+ */
+export function getCarRentalAffiliateUrl(
+  cityName: string,
+  pickupDate?: string,
+  returnDate?: string
+): string {
+  const baseUrl = 'https://www.discovercars.com/es';
+  const params = new URLSearchParams({
+    a_aid: AFFILIATE_CONFIG.travelpayoutsMarker,
+    city: cityName,
+    label: `td_car_${encodeURIComponent(cityName.toLowerCase())}`,
+  });
+
+  if (pickupDate) {
+    params.set('pickup_date', pickupDate.split('T')[0]);
+  }
+  if (returnDate) {
+    params.set('return_date', returnDate.split('T')[0]);
+  }
+
+  return `${baseUrl}?${params.toString()}`;
+}

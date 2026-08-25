@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { ActivitySuggestion } from '@/lib/types';
-import { Plus, Check, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Plus, Check, ExternalLink, ShieldCheck, Car } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getFlightBookingAffiliateUrl, getBookingAffiliateUrl, getCarRentalAffiliateUrl } from '@/lib/affiliate';
 
 interface PriceBreakdownProps {
   flightPrice: number;
@@ -14,6 +15,8 @@ interface PriceBreakdownProps {
   destinationCity?: string;
   originCode?: string;
   hotelName?: string;
+  carPrice?: number;
+  carAdded?: boolean;
 }
 
 export default function PriceBreakdown({
@@ -25,6 +28,8 @@ export default function PriceBreakdown({
   destinationCity = 'Europa',
   originCode = 'TFS',
   hotelName = 'Hotel',
+  carPrice = 0,
+  carAdded = false,
 }: PriceBreakdownProps) {
   const [selectedActivities, setSelectedActivities] = useState<number[]>([]);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -39,18 +44,13 @@ export default function PriceBreakdown({
     return acc + (activities ? activities[idx]?.price || 0 : 0);
   }, 0);
 
-  const grandTotal = totalPrice + activitiesCost;
+  const grandTotal = totalPrice + activitiesCost + (carAdded ? carPrice : 0);
   const budgetPercentage = Math.min(100, Math.round((grandTotal / budget) * 100));
   const isOverBudget = grandTotal > budget;
   const barColor = isOverBudget ? 'bg-td-coral' : 'bg-td-emerald';
 
-  const flightBookingUrl = `https://www.google.com/travel/flights?q=Flights%20to%20${encodeURIComponent(
-    destinationCity
-  )}%20from%20${originCode}`;
-
-  const hotelBookingUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(
-    `${hotelName} ${destinationCity}`
-  )}`;
+  const flightBookingUrl = getFlightBookingAffiliateUrl(originCode, 'DEST');
+  const hotelBookingUrl = getBookingAffiliateUrl(hotelName, destinationCity);
 
   return (
     <>
@@ -76,6 +76,13 @@ export default function PriceBreakdown({
             <span className="text-td-secondary flex items-center gap-2">🏨 Hotel céntrico (3 noches)</span>
             <span className="font-bold text-white">{hotelPrice} €</span>
           </div>
+
+          {carAdded && (
+            <div className="flex justify-between items-center text-xs sm:text-sm text-emerald-400 font-semibold pt-2 border-t border-white/5">
+              <span className="flex items-center gap-1.5">🚗 Coche de alquiler</span>
+              <span>+{carPrice} €</span>
+            </div>
+          )}
 
           {selectedActivities.length > 0 && (
             <div className="flex justify-between items-center text-xs sm:text-sm text-td-amber font-semibold pt-2 border-t border-white/5">

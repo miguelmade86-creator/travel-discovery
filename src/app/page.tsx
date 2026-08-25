@@ -203,60 +203,8 @@ export default function Home() {
         </div>
 
         {/* =========================================================================
-            BUDGETTRIPS-STYLE COUNTER STATS SECTION
+            DYNAMIC LIVE ANIMATED STATS BAR
            ========================================================================= */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8 border-b border-white/5 bg-[#090D18]/50">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5 text-center">
-              {[
-                {
-                  icon: <Flame className="w-5 h-5 text-td-coral" />,
-                  number: '1.450+',
-                  label: 'Escapadas Encontradas',
-                  sub: 'este mes desde Canarias',
-                },
-                {
-                  icon: <Zap className="w-5 h-5 text-td-amber" />,
-                  number: '109 €',
-                  label: 'Precio Más Bajo',
-                  sub: 'Vuelo directo + Hotel 3★',
-                },
-                {
-                  icon: <Award className="w-5 h-5 text-emerald-400" />,
-                  number: '9.8 / 10',
-                  label: 'TripScore Máximo',
-                  sub: 'Calidad & confort auditado',
-                },
-                {
-                  icon: <Plane className="w-5 h-5 text-td-violet" />,
-                  number: '12',
-                  label: 'Destinos Directos',
-                  sub: 'Península, Europa & Marruecos',
-                },
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 }}
-                  className="bg-white/[0.02] border border-white/[0.08] p-5 sm:p-6 rounded-3xl flex flex-col items-center gap-1.5 hover:border-td-coral/30 hover:bg-white/[0.04] transition-all shadow-md"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-1">
-                    {stat.icon}
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black td-gradient-text tracking-tight">
-                    {stat.number}
-                  </div>
-                  <div className="text-xs sm:text-sm font-bold text-white">{stat.label}</div>
-                  <div className="text-[11px] text-td-muted">{stat.sub}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* TRUST & STATS BAR */}
         <TrustStatsBar />
 
         {/* POPULAR DESTINATIONS CAROUSEL */}
