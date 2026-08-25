@@ -257,3 +257,25 @@ export const SPANISH_HOLIDAYS: HolidayItem[] = [
 ];
 
 export const CANARY_HOLIDAYS = SPANISH_HOLIDAYS;
+
+// ========================================
+// TRAVELPAYOUTS DATA API SCHEMA
+// ========================================
+
+export interface TravelpayoutsFlightItem {
+  price: number;
+  airline: string;
+  flight_number: number | string;
+  departure_at: string;
+  return_at?: string;
+  expires_at?: string;
+  transfers?: number;
+  duration?: number;
+}
+
+export interface TravelpayoutsCheapResponse {
+  success: boolean;
+  data?: Record<string, Record<string, TravelpayoutsFlightItem>>;
+  error?: string | null;
+  currency?: string;
+}

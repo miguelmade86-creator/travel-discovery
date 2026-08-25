@@ -48,8 +48,29 @@ const AIRLINE_NAMES: Record<string, string> = {
 };
 
 import { DESTINATION_DIRECTORY, resolveDestinationMeta, DestinationMeta } from './destination-data';
+import { TravelpayoutsCheapResponse, TravelpayoutsFlightItem } from './types';
 export { DESTINATION_DIRECTORY, resolveDestinationMeta };
 export type { DestinationMeta };
+
+// Type Guard for Travelpayouts cheap response
+function isValidTravelpayoutsResponse(json: unknown): json is TravelpayoutsCheapResponse {
+  if (!json || typeof json !== 'object') return false;
+  const res = json as Record<string, unknown>;
+  return typeof res.success === 'boolean';
+}
+
+// Type Guard for Individual Flight Option
+function isValidFlightItem(item: unknown): item is TravelpayoutsFlightItem {
+  if (!item || typeof item !== 'object') return false;
+  const f = item as Record<string, unknown>;
+  const price = Number(f.price);
+  return (
+    !isNaN(price) &&
+    price > 0 &&
+    typeof f.airline === 'string' &&
+    f.airline.trim().length > 0
+  );
+}
 
 /**
  * Fetches live cheap flight combinations directly from Travelpayouts / Aviasales Data API
@@ -84,31 +105,33 @@ export async function getLiveFlightTrips(
       return [];
     }
 
-    const json = await res.json();
-    console.log(`[Travelpayouts API] Raw destinations received:`, json.data ? Object.keys(json.data) : 'No data');
+    const json: unknown = await res.json();
 
-    if (!json.success || !json.data || Object.keys(json.data).length === 0) {
+    if (!isValidTravelpayoutsResponse(json) || !json.success || !json.data || Object.keys(json.data).length === 0) {
+      console.warn('[Travelpayouts API] Invalid or empty response payload');
       return [];
     }
 
+    console.log(`[Travelpayouts API] Raw destinations received:`, Object.keys(json.data));
+
     const trips: TripCombination[] = [];
-    const destEntries = Object.entries(json.data) as [string, Record<string, any>][];
+    const destEntries = Object.entries(json.data);
 
     for (const [destIata, flightOptions] of destEntries) {
       // Resolve destination metadata (Directory or dynamic fallback)
       const destMeta = resolveDestinationMeta(destIata);
 
-      // Get the cheapest flight option
+      // Get the flight options array
+      if (!flightOptions || typeof flightOptions !== 'object') continue;
       const optionsArray = Object.values(flightOptions);
       if (optionsArray.length === 0) continue;
 
-      const flightInfo: any = optionsArray[0];
+      const flightInfo = optionsArray[0];
+      if (!isValidFlightItem(flightInfo)) continue;
       
-      // 100% REAL RAW FLIGHT PRICE from Travelpayouts / Aviasales (No artificial manipulation)
-      const rawPrice = Number(flightInfo.price) || 0;
-      if (rawPrice <= 0) continue;
-
-      const finalFlightPrice = rawPrice;
+      // 100% REAL RAW FLIGHT PRICE from Travelpayouts / Aviasales
+      const finalFlightPrice = Math.round(Number(flightInfo.price));
+      if (finalFlightPrice <= 0 || isNaN(finalFlightPrice)) continue;
 
       const departureDate = flightInfo.departure_at || new Date(Date.now() + 86400000 * 20).toISOString();
       const returnDate = flightInfo.return_at || new Date(Date.now() + 86400000 * (20 + nightsCount)).toISOString();
