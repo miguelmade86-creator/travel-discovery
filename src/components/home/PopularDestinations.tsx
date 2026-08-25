@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useFlightOffers } from '@/lib/hooks/useFlightOffers';
 import { POPULAR_DESTINATIONS } from '@/lib/mock-data';
-import { TripCombination } from '@/lib/types';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, ArrowUpRight, Compass, Star } from 'lucide-react';
@@ -20,42 +19,18 @@ export default function PopularDestinations({
   nights = 3,
   month = 'Octubre',
 }: PopularDestinationsProps) {
-  const [liveTrips, setLiveTrips] = useState<TripCombination[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { trips, source } = useFlightOffers({
+    origin,
+    isResident,
+    nights,
+    month,
+  });
 
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
-
-    const query = new URLSearchParams({
-      origin: origin,
-      resident: isResident ? 'true' : 'false',
-      nights: nights.toString(),
-      month: month,
-    });
-
-    fetch(`/api/flights?${query.toString()}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          setLiveTrips(data.data.slice(0, 8));
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [origin, isResident, nights, month]);
-
-  const usingMockData = liveTrips.length === 0 && !isLoading;
+  const usingMockData = source !== 'live';
 
   // If live trips from API are ready, display them; otherwise display base destinations
-  const displayItems = liveTrips.length > 0
-    ? liveTrips.map((trip) => ({
+  const displayItems = trips.length > 0
+    ? trips.slice(0, 8).map((trip) => ({
         city: trip.destination.city,
         flag: trip.destination.flag,
         image: trip.destination.image,

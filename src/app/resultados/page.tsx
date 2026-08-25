@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -8,9 +8,9 @@ import SearchSummaryBar from '@/components/results/SearchSummaryBar';
 import FilterBar from '@/components/results/FilterBar';
 import TripCard from '@/components/results/TripCard';
 import TripCompareModal from '@/components/results/TripCompareModal';
-import { MOCK_TRIPS } from '@/lib/mock-data';
-import { SearchFilters, TripCombination, TRAVEL_VIBES, TravelVibe, AccommodationType, ALL_AIRPORTS } from '@/lib/types';
-import { Compass, RefreshCw, Sparkles, MessageCircle, X, RotateCcw, Scale, ArrowRight } from 'lucide-react';
+import { useFlightOffers } from '@/lib/hooks/useFlightOffers';
+import { SearchFilters, TripCombination, TRAVEL_VIBES, TravelVibe, AccommodationType } from '@/lib/types';
+import { Compass, RefreshCw, MessageCircle, X, RotateCcw, Scale, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { AFFILIATE_CONFIG } from '@/lib/affiliate';
 
@@ -35,41 +35,20 @@ function ResultsContent() {
   const [activeVibe, setActiveVibe] = useState<TravelVibe>(paramVibe);
   const [accommodation, setAccommodation] = useState<AccommodationType>(paramAccommodation);
   const [excludedCities, setExcludedCities] = useState<string[]>([]);
-  const [liveTrips, setLiveTrips] = useState<TripCombination[]>([]);
-  const [isLoadingLive, setIsLoadingLive] = useState(true);
   
   // Side-by-Side Comparison State
   const [compareTrips, setCompareTrips] = useState<TripCombination[]>([]);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
-  // Fetch full live flight trips from Travelpayouts Data API
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoadingLive(true);
+  // Single Source of Truth SWR Data Hook
+  const { trips: tripsWithPricing, isLoading: isLoadingLive, source } = useFlightOffers({
+    origin: paramOrigin,
+    isResident: paramResident,
+    nights: paramNights,
+    month: paramMonth,
+  });
 
-    const query = new URLSearchParams({
-      origin: paramOrigin,
-      resident: paramResident ? 'true' : 'false',
-      nights: paramNights.toString(),
-      month: paramMonth,
-    });
-
-    fetch(`/api/flights?${query.toString()}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          setLiveTrips(data.data);
-        }
-      })
-      .catch((err) => console.error('Error fetching live trips:', err))
-      .finally(() => {
-        if (isMounted) setIsLoadingLive(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [paramOrigin, paramResident, paramNights, paramMonth]);
+  const usingMockData = source !== 'live';
 
   const handleToggleCompare = (trip: TripCombination) => {
     setCompareTrips((prev) => {
@@ -95,33 +74,6 @@ function ResultsContent() {
   const handleClearExcluded = () => {
     setExcludedCities([]);
   };
-
-  const originAirport = useMemo(() => {
-    return ALL_AIRPORTS.find((a) => a.code === paramOrigin) || ALL_AIRPORTS[0];
-  }, [paramOrigin]);
-
-  // Use live trips from Travelpayouts API if available, or fall back to curated base trips (without arbitrary multipliers)
-  const tripsWithPricing = useMemo(() => {
-    if (liveTrips.length > 0) {
-      return liveTrips;
-    }
-
-    return MOCK_TRIPS
-      .filter((trip) => trip.destination.city.toLowerCase() !== originAirport.city.toLowerCase())
-      .map((trip) => {
-        return {
-          ...trip,
-          outboundFlight: {
-            ...trip.outboundFlight,
-            origin: originAirport,
-          },
-          returnFlight: {
-            ...trip.returnFlight,
-            destination: originAirport,
-          },
-        } as TripCombination;
-      });
-  }, [liveTrips, originAirport]);
 
   // Filter & Sort
   const filteredTrips = useMemo(() => {
@@ -177,8 +129,6 @@ function ResultsContent() {
 
     return trips;
   }, [tripsWithPricing, excludedCities, accommodation, directOnly, breakfastOnly, activeVibe, budget, sortBy]);
-
-  const usingMockData = liveTrips.length === 0 && !isLoadingLive;
 
   return (
     <>
@@ -300,12 +250,12 @@ function ResultsContent() {
               <Compass className="w-8 h-8 text-td-coral" />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
-              {accommodation === 'apartment' && liveTrips.length > 0
+              {accommodation === 'apartment' && source === 'live'
                 ? 'Filtro Airbnb solo disponible en escapadas de ejemplo'
                 : 'No encontramos escapadas con estos filtros'}
             </h2>
             <p className="text-td-secondary text-sm max-w-md mb-6 leading-relaxed">
-              {accommodation === 'apartment' && liveTrips.length > 0
+              {accommodation === 'apartment' && source === 'live'
                 ? 'Las tarifas en vivo de aerolíneas se combinan actualmente con hoteles recomendados. Cambia el filtro a "Todos" o "Hoteles" para ver todas las tarifas en vivo.'
                 : 'Prueba a cambiar a "Todos los alojamientos", subir el presupuesto o cambiar la temática.'}
             </p>

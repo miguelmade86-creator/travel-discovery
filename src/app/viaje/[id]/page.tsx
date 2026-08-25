@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
+import { useFlightOffers } from '@/lib/hooks/useFlightOffers';
 import { MOCK_TRIPS } from '@/lib/mock-data';
 import { TripCombination } from '@/lib/types';
 import Header from '@/components/layout/Header';
@@ -21,67 +22,42 @@ import { getCivitatisAffiliateUrl } from '@/lib/affiliate';
 
 export default function TripDetailPage() {
   const params = useParams();
-  const id = params.id as string;
-  const [trip, setTrip] = useState<TripCombination | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const id = (params?.id as string) || '';
 
   const [carAdded, setCarAdded] = useState(false);
   const [carPrice, setCarPrice] = useState(0);
   const [insuranceAdded, setInsuranceAdded] = useState(false);
   const [insurancePrice, setInsurancePrice] = useState(0);
 
-  useEffect(() => {
-    let isMounted = true;
-    setIsLoading(true);
+  // Extract origin and destination from dynamic ID if available
+  const parts = id.split('-');
+  const isDynamic = parts.length >= 3 && parts[0] === 'trip';
+  const destCode = isDynamic ? parts[1].toUpperCase() : '';
+  const originCode = isDynamic ? parts[2].toUpperCase() : 'TFS';
 
-    const resolveTrip = async () => {
-      // 1. Check if ID follows dynamic format: trip-<destIata>-<origin>
-      const parts = (id || '').split('-');
-      if (parts.length >= 3 && parts[0] === 'trip') {
-        const destCode = parts[1].toUpperCase();
-        const originCode = parts[2].toUpperCase();
+  const { trips, isLoading } = useFlightOffers({ origin: originCode });
 
-        try {
-          const res = await fetch(`/api/flights?origin=${originCode}`);
-          const json = await res.json();
-          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-            const liveMatch = json.data.find(
-              (t: TripCombination) =>
-                t.id.toLowerCase() === id.toLowerCase() ||
-                t.outboundFlight.destination.code.toUpperCase() === destCode
-            );
-            if (liveMatch && isMounted) {
-              setTrip(liveMatch);
-              setIsLoading(false);
-              return;
-            }
-          }
-        } catch (err) {
-          console.error('Error resolving live trip:', err);
-        }
-      }
+  const trip = useMemo<TripCombination | null>(() => {
+    if (trips.length > 0) {
+      const liveMatch = trips.find(
+        (t) =>
+          t.id.toLowerCase() === id.toLowerCase() ||
+          t.outboundFlight.destination.code.toUpperCase() === destCode
+      );
+      if (liveMatch) return liveMatch;
+    }
 
-      // 2. Fallback to MOCK_TRIPS if dynamic fetch fails or if ID is a mock ID
-      if (isMounted) {
-        let mockMatch = MOCK_TRIPS.find((t) => t.id === id);
-        if (!mockMatch && id) {
-          const cleanId = id.toLowerCase();
-          mockMatch = MOCK_TRIPS.find((t) =>
-            cleanId.includes(t.outboundFlight.destination.code.toLowerCase()) ||
-            cleanId.includes(t.destination.city.toLowerCase())
-          );
-        }
-        setTrip(mockMatch || null);
-        setIsLoading(false);
-      }
-    };
-
-    resolveTrip();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [id]);
+    let mockMatch = MOCK_TRIPS.find((t) => t.id === id);
+    if (!mockMatch && id) {
+      const cleanId = id.toLowerCase();
+      mockMatch = MOCK_TRIPS.find(
+        (t) =>
+          cleanId.includes(t.outboundFlight.destination.code.toLowerCase()) ||
+          cleanId.includes(t.destination.city.toLowerCase())
+      );
+    }
+    return mockMatch || null;
+  }, [trips, id, destCode]);
 
   if (isLoading) {
     return (

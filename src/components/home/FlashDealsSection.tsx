@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useFlightOffers } from '@/lib/hooks/useFlightOffers';
 import { motion } from 'framer-motion';
 import { Flame, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { TripCombination } from '@/lib/types';
 
 interface FlashDealsSectionProps {
   origin?: string;
@@ -19,32 +18,14 @@ export default function FlashDealsSection({
   nights = 3,
   month = 'Octubre',
 }: FlashDealsSectionProps) {
-  const [liveDeals, setLiveDeals] = useState<TripCombination[]>([]);
+  const { trips } = useFlightOffers({
+    origin,
+    isResident,
+    nights,
+    month,
+  });
 
-  useEffect(() => {
-    let isMounted = true;
-    const query = new URLSearchParams({
-      origin: origin,
-      resident: isResident ? 'true' : 'false',
-      nights: nights.toString(),
-      month: month,
-    });
-
-    fetch(`/api/flights?${query.toString()}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          // Sort by cheapest price and take the top 4
-          const sorted = [...data.data].sort((a, b) => a.totalPrice - b.totalPrice);
-          setLiveDeals(sorted.slice(0, 4));
-        }
-      })
-      .catch(() => {});
-
-    return () => {
-      isMounted = false;
-    };
-  }, [origin, isResident, nights, month]);
+  const liveDeals = [...trips].sort((a, b) => a.totalPrice - b.totalPrice).slice(0, 4);
 
   if (liveDeals.length === 0) {
     return null;
@@ -65,12 +46,12 @@ export default function FlashDealsSection({
               Escapadas por <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-td-coral to-amber-300">menos de 120 €</span>
             </h2>
             <p className="text-td-secondary text-sm sm:text-base mt-2 max-w-xl">
-              Vuelo ida y vuelta con aerolínea real + 3 noches de hotel céntrico. Tarifas mínimas detectadas en vivo.
+              Vuelo ida y vuelta con aerolínea real + {nights} noches de hotel céntrico. Tarifas mínimas detectadas en vivo.
             </p>
           </div>
 
           <Link
-            href={`/resultados?budget=120&origin=${origin}&resident=${isResident}`}
+            href={`/resultados?budget=120&origin=${origin}&resident=${isResident}&nights=${nights}&month=${encodeURIComponent(month)}`}
             className="td-pill text-xs font-bold text-white hover:text-rose-400 flex items-center gap-2 self-start sm:self-auto py-2.5 px-5 shadow-md border-rose-500/30 group"
           >
             <span>Ver todos los chollos desde {origin}</span>
