@@ -1255,61 +1255,18 @@ export const MOCK_TRIPS: TripCombination[] = [
   },
 ];
 
+import { DESTINATION_DIRECTORY } from './destination-data';
+
 export const POPULAR_DESTINATIONS = [
-  {
-    city: 'Oporto',
-    country: 'Portugal',
-    flag: '🇵🇹',
-    image: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80',
-    from: 118,
-  },
-  {
-    city: 'Málaga',
-    country: 'España',
-    flag: '🇪🇸',
-    image: 'https://images.unsplash.com/photo-1579282240050-352db0a14c21?w=800&q=80',
-    from: 109,
-  },
-  {
-    city: 'Barcelona',
-    country: 'España',
-    flag: '🇪🇸',
-    image: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80',
-    from: 129,
-  },
-  {
-    city: 'Madrid',
-    country: 'España',
-    flag: '🇪🇸',
-    image: 'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80',
-    from: 122,
-  },
-  {
-    city: 'Sevilla',
-    country: 'España',
-    flag: '🇪🇸',
-    image: 'https://images.unsplash.com/photo-1559564484-e48b3e040ff4?w=800&q=80',
-    from: 116,
-  },
-  {
-    city: 'Marrakech',
-    country: 'Marruecos',
-    flag: '🇲🇦',
-    image: 'https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=800&q=80',
-    from: 135,
-  },
-  {
-    city: 'Roma',
-    country: 'Italia',
-    flag: '🇮🇹',
-    image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80',
-    from: 158,
-  },
-  {
-    city: 'Lisboa',
-    country: 'Portugal',
-    flag: '🇵🇹',
-    image: 'https://images.unsplash.com/photo-1509840841025-9088ba78a826?w=800&q=80',
-    from: 138,
-  },
-];
+  'OPO', 'AGP', 'BCN', 'MAD', 'SVQ', 'RAK', 'ROM', 'LIS'
+].map((code) => {
+  const meta = DESTINATION_DIRECTORY[code] || DESTINATION_DIRECTORY['BCN'];
+  return {
+    city: meta.city,
+    country: meta.country,
+    flag: meta.flag,
+    image: meta.image,
+    from: meta.hotelNightly * 3 + 35,
+  };
+});
+
