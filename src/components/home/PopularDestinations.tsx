@@ -1,11 +1,55 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { POPULAR_DESTINATIONS } from '@/lib/mock-data';
+import { TripCombination } from '@/lib/types';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, ArrowUpRight, Compass, Star } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Compass, Star, Sparkles } from 'lucide-react';
 
-export default function PopularDestinations() {
+interface PopularDestinationsProps {
+  origin?: string;
+  isResident?: boolean;
+}
+
+export default function PopularDestinations({ origin = 'TFS', isResident = true }: PopularDestinationsProps) {
+  const [liveTrips, setLiveTrips] = useState<TripCombination[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch(`/api/flights?origin=${origin}&resident=${isResident}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setLiveTrips(data.data.slice(0, 8));
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, [origin, isResident]);
+
+  // If live trips from API are ready, display them; otherwise display base destinations
+  const displayItems = liveTrips.length > 0
+    ? liveTrips.map((trip) => ({
+        city: trip.destination.city,
+        flag: trip.destination.flag,
+        image: trip.destination.image,
+        from: trip.totalPrice,
+        airline: trip.outboundFlight.airline,
+        tripId: trip.id,
+      }))
+    : POPULAR_DESTINATIONS.map((dest) => ({
+        city: dest.city,
+        flag: dest.flag,
+        image: dest.image,
+        from: dest.from,
+        airline: 'Vuelo directo',
+        tripId: undefined,
+      }));
+
   return (
     <section className="w-full py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -15,7 +59,7 @@ export default function PopularDestinations() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-td-coral/10 border border-td-coral/20 text-xs text-td-coral font-bold uppercase tracking-wider mb-3">
               <Compass className="w-3.5 h-3.5" />
-              Destinos Estrella · Vuelo + Hotel
+              <span>Tarifas en Vivo · Salida desde {origin}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
               Escapadas más deseadas <span className="td-gradient-text">de toda España</span>
@@ -26,17 +70,17 @@ export default function PopularDestinations() {
           </div>
 
           <Link
-            href="/resultados"
+            href={`/resultados?origin=${origin}&resident=${isResident}`}
             className="td-pill text-xs font-bold text-white hover:text-td-coral flex items-center gap-2 self-start sm:self-auto py-2.5 px-5 shadow-md group"
           >
-            <span>Explorar los 12 destinos</span>
+            <span>Ver todas las escapadas ({origin})</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {/* Destination Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {POPULAR_DESTINATIONS.map((dest, i) => (
+          {displayItems.map((dest, i) => (
             <motion.div
               key={dest.city}
               initial={{ opacity: 0, y: 25 }}
@@ -45,7 +89,7 @@ export default function PopularDestinations() {
               transition={{ delay: i * 0.05, duration: 0.5 }}
             >
               <Link
-                href={`/resultados?budget=${dest.from + 40}&resident=true`}
+                href={dest.tripId ? `/viaje/${dest.tripId}` : `/resultados?budget=${dest.from + 40}&origin=${origin}&resident=${isResident}`}
                 className="relative h-80 rounded-[28px] overflow-hidden group block border border-white/10 shadow-xl td-glass-card-hover"
               >
                 {/* Background Image with Zoom on Hover */}
@@ -65,7 +109,7 @@ export default function PopularDestinations() {
                   <span>{dest.city}</span>
                 </div>
 
-                {/* Top Right: BudgetTrips-style Circular Action Arrow Button */}
+                {/* Top Right: Action Arrow Button */}
                 <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white opacity-80 group-hover:opacity-100 group-hover:bg-td-coral group-hover:text-[#0B0F1A] group-hover:scale-110 transition-all duration-300 shadow-lg">
                   <ArrowUpRight className="w-4 h-4" />
                 </div>
@@ -87,7 +131,9 @@ export default function PopularDestinations() {
                       <h3 className="text-lg font-extrabold text-white group-hover:text-td-coral transition-colors">
                         {dest.city}
                       </h3>
-                      <p className="text-[11px] text-td-muted">Vuelo directo + 3 noches hotel</p>
+                      <p className="text-[11px] text-td-muted">
+                        {dest.airline} + 3 noches hotel
+                      </p>
                     </div>
 
                     <div className="text-right">

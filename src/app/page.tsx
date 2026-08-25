@@ -213,10 +213,10 @@ export default function Home() {
         {/* =========================================================================
             VIRAL FLASH DEALS UNDER 99€
            ========================================================================= */}
-        <FlashDealsSection />
+        <FlashDealsSection origin={origin} isResident={isResident} />
 
         {/* POPULAR DESTINATIONS CAROUSEL */}
-        <PopularDestinations />
+        <PopularDestinations origin={origin} isResident={isResident} />
 
         {/* =========================================================================
             SMART SPANISH BANK HOLIDAYS & LONG WEEKENDS PLANNER
